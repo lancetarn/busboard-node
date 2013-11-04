@@ -1,0 +1,8 @@
+h2 Register
+    div.register
+        form(name="register")
+            label(for="newuser") New Username
+            input(type="text", ng-model="newuser", name="newuser")
+            label(for="newpass") New Password
+            input(type="password", ng-model="newpass", name="newpass")
+            button(ng-click="addUser()") Register

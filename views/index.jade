@@ -1,0 +1,24 @@
+extends layout
+
+block body
+  div
+    h2 BusBoard
+    ul.menu
+      li
+        a(href='login') Login
+      li
+        a(href='mystops') My Stops
+      li
+        a(href='register') Register
+
+    flash:messages
+    div(ng-view)
+
+
+  script(src='js/lib/angular/angular.js')
+  script(src='js/angular-flash.js')
+  script(src='js/services.js')
+  script(src='js/controllers.js')
+  script(src='js/filters.js')
+  script(src='js/directives.js')
+  script(src='js/app.js')

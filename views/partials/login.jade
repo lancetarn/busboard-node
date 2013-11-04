@@ -1,0 +1,10 @@
+h2 Login
+    div.login
+        form(name="login")
+            label(for="username") Username
+            input(type="text", ng-model="username", name="username")
+            label(for="password") Password
+            input(type="password", ng-model="password", name="password")
+            button(ng-click="authenticate()") Login
+    div.logout
+        a(href="logout", ng-click="logout()") Log Out
