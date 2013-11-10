@@ -51,7 +51,8 @@ angular.module('myApp.controllers', [])
   
   .controller('LoginCtrl', ['$scope', 'userService', function( $scope, userService ) {
     $scope.authenticate = function( ) {
-        userService.login( $scope.username, $scope.password );
+        $scope.authenticated = userService.login( $scope.username, $scope.password );
+        
     };
     $scope.logout = function( ) {
         userService.logout( );

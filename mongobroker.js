@@ -1,4 +1,5 @@
 var mongo = require('mongodb');
+var q = require('q');
 var mongoClient = mongo.MongoClient;
 var broker;
 

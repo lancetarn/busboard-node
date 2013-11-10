@@ -1,5 +1,6 @@
 // Declare app level module which depends on filters, and services
 
+console.log('Loading myApp');
 angular.module('myApp', [
   'myApp.controllers',
   'myApp.filters',

@@ -9,6 +9,8 @@ var express = require('express'),
   http = require('http'),
   path = require('path');
 
+  console.log( 'app: ',api );
+
 var app = module.exports = express();
 
 /**
@@ -47,7 +49,8 @@ app.get('/', routes.index);
 app.get('/partials/:name', routes.partials);
 
 // JSON API
-app.post('/api/user', api.addUser);
+app.post('/api/user', api.apiusers.users.addUser);
+app.get('/api/user', api.apiusers.users.authenticate);
 
 // redirect all others to the index (HTML5 history)
 app.get('*', routes.index);
