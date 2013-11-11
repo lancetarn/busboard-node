@@ -15,6 +15,19 @@ mongoClient.connect('mongodb://localhost/busboard?w=1&auto_reconnect=true', func
 
 module.exports = {
 
+   makeId : function( idString ) {
+       return new mongo.ObjectID(idString);
+   },
+
+   update : function( collName, query, doc, options, callback ) {
+       var collection = broker.collection(collName);
+       collection.update(query, doc, options, function(err, count) {
+           if (err) return callback(err);
+
+           callback(null, count);
+       });
+   },
+
    insert : function( collName, doc, callback ) {
      var collection = broker.collection(collName);
      collection.insert(doc, function(err, docs) {

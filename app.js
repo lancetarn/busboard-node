@@ -50,7 +50,8 @@ app.get('/partials/:name', routes.partials);
 
 // JSON API
 app.post('/api/user', api.apiusers.users.addUser);
-app.get('/api/user', api.apiusers.users.authenticate);
+app.post('/api/login', api.apiusers.users.login);
+app.post('/api/stops', api.apiusers.users.addStop);
 
 // redirect all others to the index (HTML5 history)
 app.get('*', routes.index);

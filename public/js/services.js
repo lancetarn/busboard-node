@@ -12,7 +12,7 @@ angular.module('myApp.services', []).
                 data : {"username" : username, "password" : password}
             };
             return $http(config).success( function(data, status, headers, config) {
-                return data.authenticated;
+                return data;
             } );
         },
 

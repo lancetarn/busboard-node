@@ -7,11 +7,12 @@ angular.module('myApp.controllers', [])
   .controller('RouteCtrl', ['$scope', '$http', function($scope, $http) {
     var nexTripBase = 'http://svc.metrotransit.org/NexTrip';
     var nexTripQuery = '?format=json&callback=JSON_CALLBACK';
-    $scope.init = function( ) {
+    $scope.getRoutes = function( ) {
       // Grab all the routes from NexTrip
       $http.jsonp( nexTripBase + '/Routes' + nexTripQuery )
       .then( function(rsp){
         console.log(rsp.data);
+        $scope.gotRoutes = true;
         $scope.routes = rsp.data;
      });
     };        
@@ -34,6 +35,14 @@ angular.module('myApp.controllers', [])
         });
     };
 
+    $scope.setHotStop = function( ) {
+        $scope.HotStop = { 
+            route : $scope.selectedRoute,
+            direction : $scope.selectedDirection,
+            stop : $scope.selectedStop
+        };
+    };
+
     $scope.getDepartures = function( ) {
         var departureUrl = nexTripBase +
             '/' + $scope.selectedRoute.Route +
@@ -45,6 +54,24 @@ angular.module('myApp.controllers', [])
             console.log(rsp);
             $scope.departures = rsp.data;
         });
+    };
+
+    $scope.saveHotStop = function( ) {
+        var config = {
+            method : 'POST',
+            url : 'api/stops',
+            data : {
+                "route" : $scope.selectedRoute,
+                "direction" : $scope.selectedDirection,
+                "stop" : $scope.selectedStop
+            }
+        };
+        console.log(config.data);
+        $http(config)
+        .then( function(rsp) {
+            console.log(rsp);
+        });
+
     };
 
   }])

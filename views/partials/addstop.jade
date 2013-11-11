@@ -1,0 +1,14 @@
+button(ng-click="getRoutes()") Add Stop
+
+select.route(ng-model="selectedRoute", ng-show="routes", ng-change="getDirections()", ng-options="r.Description for r in routes")
+        option(value="") Select route...
+
+select.direction(ng-model="selectedDirection", ng-show="directions", ng-change="getStops()", ng-options="d.Text for d in directions")
+    option(value="") Select direction...
+
+select.stop(ng-model="selectedStop", ng-show="stops", ng-options="s.Text for s in stops")
+    option(value="") Select stop...
+
+div(ng-show="selectedRoute && selectedDirection && selectedStop")
+    button(ng-click="saveHotStop()") Save Stop
+    button(ng-click="getDepartures()") View Departures

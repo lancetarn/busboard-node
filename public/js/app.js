@@ -18,8 +18,8 @@ config(['$routeProvider', '$locationProvider', function ($routeProvider, $locati
       controller: 'LoginCtrl'
     }).
     when('/mystops', {
-      templateUrl: 'partials/mystops',
-      controller: 'MyStopCtrl'
+      templateUrl: 'partials/addstop',
+      controller: 'RouteCtrl'
     }).
     when('/register', {
         templateUrl: 'partials/register',
