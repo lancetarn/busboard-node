@@ -12,6 +12,9 @@ block body
         a(href='register') Register
 
     flash:messages
+    div(class="stoplist", ng-show="hotstops")
+        ul.hotstops
+            li(ng-repeat="s in hotstops") {{s.route.Description }} - {{s.direction.Text}} - {{s.stop.Text}}
     div(ng-view)
 
 

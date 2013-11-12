@@ -6,7 +6,7 @@ select.route(ng-model="selectedRoute", ng-show="routes", ng-change="getDirection
 select.direction(ng-model="selectedDirection", ng-show="directions", ng-change="getStops()", ng-options="d.Text for d in directions")
     option(value="") Select direction...
 
-select.stop(ng-model="selectedStop", ng-show="stops", ng-options="s.Text for s in stops")
+select.stop(ng-model="selectedStop", ng-show="stops", ng-options="s.Text for s in stops", ng-change="setHotStop()")
     option(value="") Select stop...
 
 div(ng-show="selectedRoute && selectedDirection && selectedStop")

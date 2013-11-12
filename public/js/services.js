@@ -2,8 +2,8 @@
 
 /* Services */
 
-angular.module('myApp.services', []).
-  factory('userService', ['$http', function($http) {
+angular.module('myApp.services', [])
+  .factory('userService', ['$http', function($http) {
     return {
         login : function( username, password ) {
             var config = {
@@ -29,4 +29,45 @@ angular.module('myApp.services', []).
             });
         }
     };
-}]);
+}])
+
+    .factory('nexTripService', ['$http', function($http) {
+        var nexTripBase = 'http://svc.metrotransit.org/NexTrip';
+        var nexTripQuery = '?format=json&callback=JSON_CALLBACK';
+
+        return {
+            getRoutes : function( ) {
+              return $http.jsonp( nexTripBase + '/Routes' + nexTripQuery )
+              .then(function(rsp) {
+                  return rsp.data;
+              });
+            },
+
+            getDirections : function( route ) {
+              var directionUrl = nexTripBase + '/Directions/' + route.Route + nexTripQuery;
+              return $http.jsonp( directionUrl )
+                .then( function(rsp) {
+                    return rsp.data;
+                });
+            },
+
+            getStops : function( route, direction ) {
+                var stopUrl = nexTripBase + '/Stops/' + route.Route + '/' + direction.Value + nexTripQuery;
+                return $http.jsonp( stopUrl )
+                    .then( function(rsp) {
+                        return rsp.data;
+                });
+            },
+
+            getDepartures : function( HotStop ) {
+                var departureUrl = nexTripBase +
+                    '/' + HotStop.route.Route +
+                    '/' + HotStop.direction.Value +
+                    '/' + HotStop.stop.Value +
+                    nexTripQuery;
+                return $http.jsonp( departureUrl )
+                    .then(function(rsp) { return rsp.data; });
+            }
+        };
+    }]);
+            

@@ -4,55 +4,50 @@
 
 angular.module('myApp.controllers', [])
 
-  .controller('RouteCtrl', ['$scope', '$http', function($scope, $http) {
-    var nexTripBase = 'http://svc.metrotransit.org/NexTrip';
-    var nexTripQuery = '?format=json&callback=JSON_CALLBACK';
+  .controller('RouteCtrl', ['$scope', 'nexTripService', function($scope, nexTripService) {
     $scope.getRoutes = function( ) {
       // Grab all the routes from NexTrip
-      $http.jsonp( nexTripBase + '/Routes' + nexTripQuery )
-      .then( function(rsp){
-        console.log(rsp.data);
-        $scope.gotRoutes = true;
-        $scope.routes = rsp.data;
+        nexTripService.getRoutes( )
+      .then( function(routes){
+        console.log(routes);
+        $scope.routes = routes;
      });
     };        
 
     $scope.getDirections = function( ) {
-      var directionUrl = nexTripBase + '/Directions/' + $scope.selectedRoute.Route + nexTripQuery;
-      $http.jsonp( directionUrl )
-      .then( function(rsp) {
-          console.log(rsp);
-          $scope.directions = rsp.data;
+        nexTripService.getDirections( $scope.selectedRoute )
+        .then( function(directions) {
+          console.log(directions);
+          $scope.directions = directions;
         });
     };
 
     $scope.getStops = function( ) {
-        var stopUrl = nexTripBase + '/Stops/' + $scope.selectedRoute.Route + '/' +$scope.selectedDirection.Value + nexTripQuery;
-        $http.jsonp(stopUrl)
-        .then( function(rsp) {
-          console.log(rsp.data);
-          $scope.stops = rsp.data;
+        nexTripService.getStops( $scope.selectedRoute, $scope.selectedDirection )
+        .then( function(stops) {
+          console.log(stops);
+          $scope.stops = stops;
         });
     };
 
     $scope.setHotStop = function( ) {
-        $scope.HotStop = { 
-            route : $scope.selectedRoute,
-            direction : $scope.selectedDirection,
-            stop : $scope.selectedStop
-        };
+        if ( $scope.selectedRoute.Route &&
+             $scope.selectedDirection.Value &&
+             $scope.selectedStop.Value
+           ) {
+            $scope.HotStop = { 
+                route : $scope.selectedRoute,
+                direction : $scope.selectedDirection,
+                stop : $scope.selectedStop
+            };
+       }
     };
 
     $scope.getDepartures = function( ) {
-        var departureUrl = nexTripBase +
-            '/' + $scope.selectedRoute.Route +
-            '/' + $scope.selectedDirection.Value +
-            '/' + $scope.selectedStop.Value +
-            nexTripQuery;
-        $http.jsonp(departureUrl)
-        .then( function(rsp) {
-            console.log(rsp);
-            $scope.departures = rsp.data;
+        nexTripService.getDepartures($scope.HotStop)
+        .then( function(departures) {
+            console.log(departures);
+            $scope.departures = departures;
         });
     };
 
