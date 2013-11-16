@@ -38,9 +38,9 @@ module.exports = {
      } );
    },
 
-   find : function( collName, query, callback ) {
+   find : function( collName, query, fields, callback ) {
      var collection = broker.collection(collName);
-     collection.find(query).toArray( function(err, result) {
+     collection.find(query, fields).toArray( function(err, result) {
         if (err) return callback(err);
         
         callback(null, result);

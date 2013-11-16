@@ -12,15 +12,23 @@ var userHelper = {
     },
 
     getByName : function( username, callback ) {
-        mongoBroker.find( 'user', {"username" : username}, callback );
+        mongoBroker.find( 'user', {"username" : username}, undefined, callback );
     },
 
     addStop : function( userId, stop, callback ) {
-        console.log(typeof userId);
-        userId = mongoBroker.makeId(userId);
-        mongoBroker.update('user', {"_id" : userId}, {$push : {"HotStops" : stop}}, {}, callback );
-    }
+        var Id = mongoBroker.makeId(userId);
+        mongoBroker.update('user', {"_id" : Id}, {$addToSet : {"HotStops" : stop}}, {}, callback );
+    },
 
+    getStops : function( userId, callback ) {
+        var Id = mongoBroker.makeId(userId);
+        mongoBroker.find('user', {"_id" : Id}, {"HotStops":1, "_id":0}, callback );
+    },
+
+    removeStop : function( userId, stop, callback ) {
+        var Id = mongoBroker.makeId( userId );
+        mongoBroker.update( 'user', {"_id" : Id}, {$pull: {"HotStops" : stop}}, callback );
+    }
 };
     
 exports.users = {
@@ -44,7 +52,7 @@ exports.users = {
     },
 
     login : function (req, res) {
-        if ( req.session.authenticated ) throw new Error( 'Already authenticated!' );
+        if ( req.session.authenticated ) res.send({"message" : "Already logged in.", "success" : false});
         
         var creds = userHelper.getCredsFromReq(req);
         
@@ -78,7 +86,7 @@ exports.users = {
         var pass =  req.body.password,
             username = req.body.username;
 
-        mongoBroker.find( 'user', {"username" : username}, function(err, result) {
+        mongoBroker.find( 'user', {"username" : username}, undefined, function(err, result) {
             if (err) throw err;
 
             console.log( result );
@@ -105,6 +113,18 @@ exports.users = {
                     res.send({"success" : true});
                     
                 });
+            });
+        });
+    },
+
+    getHotStops : function( req, res ) {
+        var userId = req.session.authenticated;
+        userHelper.getStops( userId, function( err, result ) {
+            if ( err ) res.send({"error" : err});
+
+            res.send({
+                "success" : true,
+                "HotStops" : result[0].HotStops
             });
         });
     }

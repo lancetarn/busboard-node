@@ -27,8 +27,30 @@ angular.module('myApp.services', [])
             .success(function(data, status, headers, config) {
                 return data.message;
             });
-        }
-    };
+        },
+
+        saveHotStop : function( HotStop ) {
+            
+            var config = {
+                method : 'POST',
+                url : 'api/stops',
+                data : HotStop
+            };
+            return $http(config);
+        },
+
+        getHotStops : function( ) {
+            console.log( 'called' );
+            return $http({
+                method : 'GET',
+                url : 'api/stops',
+            })
+            .then( function( rsp ) {
+                console.log(rsp);
+                return rsp.data.HotStops;
+            });
+    }
+};
 }])
 
     .factory('nexTripService', ['$http', function($http) {

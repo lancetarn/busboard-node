@@ -5,16 +5,18 @@ block body
     h2 BusBoard
     ul.menu
       li
-        a(href='login') Login
+        a(href='login', ng-hide="authenticated") Login
+        a(href='logout', ng-show="authenticated") Logout
       li
         a(href='mystops') My Stops
       li
         a(href='register') Register
 
+    div(class="stoplist", ng-show="HotStops", ng-controller="hotStopCtrl")
+        ul.HotStops
+            li(ng-repeat="s in HotStops" data-hs=s) {{s.route.Description }} | {{s.direction.Text}} | {{s.stop.Text}}
+                button(class="delete", ng-click="removeHotStop()") [x]
     flash:messages
-    div(class="stoplist", ng-show="hotstops")
-        ul.hotstops
-            li(ng-repeat="s in hotstops") {{s.route.Description }} - {{s.direction.Text}} - {{s.stop.Text}}
     div(ng-view)
 
 

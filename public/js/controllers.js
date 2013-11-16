@@ -4,9 +4,18 @@
 
 angular.module('myApp.controllers', [])
 
-  .controller('RouteCtrl', ['$scope', 'nexTripService', function($scope, nexTripService) {
+  .controller('hotStopCtrl', ['$scope', 'userService', function( $scope, userService ) {
+      userService.getHotStops( )
+      .then( function( HotStops ) {
+          console.log(HotStops);
+          $scope.HotStops = HotStops;
+          console.log($scope);
+         });
+  }])
+
+  .controller('RouteCtrl', ['$scope', 'userService', 'nexTripService', 'flash', function($scope, userService, nexTripService, flash ) {
     $scope.getRoutes = function( ) {
-      // Grab all the routes from NexTrip
+      // Grab all known routes from NexTrip.
         nexTripService.getRoutes( )
       .then( function(routes){
         console.log(routes);
@@ -14,6 +23,7 @@ angular.module('myApp.controllers', [])
      });
     };        
 
+    // Get the directions available for a given route.
     $scope.getDirections = function( ) {
         nexTripService.getDirections( $scope.selectedRoute )
         .then( function(directions) {
@@ -22,6 +32,7 @@ angular.module('myApp.controllers', [])
         });
     };
 
+    // Get the stops for a given route, ordered by direction.
     $scope.getStops = function( ) {
         nexTripService.getStops( $scope.selectedRoute, $scope.selectedDirection )
         .then( function(stops) {
@@ -30,6 +41,7 @@ angular.module('myApp.controllers', [])
         });
     };
 
+    // Set the current HotStop, if it is complete.
     $scope.setHotStop = function( ) {
         if ( $scope.selectedRoute.Route &&
              $scope.selectedDirection.Value &&
@@ -43,6 +55,7 @@ angular.module('myApp.controllers', [])
        }
     };
 
+    // Get departures for the set HotStop from nexTrip.
     $scope.getDepartures = function( ) {
         nexTripService.getDepartures($scope.HotStop)
         .then( function(departures) {
@@ -51,29 +64,21 @@ angular.module('myApp.controllers', [])
         });
     };
 
+    // Save the set HotStop to the user.
     $scope.saveHotStop = function( ) {
-        var config = {
-            method : 'POST',
-            url : 'api/stops',
-            data : {
-                "route" : $scope.selectedRoute,
-                "direction" : $scope.selectedDirection,
-                "stop" : $scope.selectedStop
-            }
-        };
-        console.log(config.data);
-        $http(config)
+        userService.saveHotStop( $scope.HotStop )
         .then( function(rsp) {
             console.log(rsp);
+            flash(rsp.message);
+            $scope = {};
         });
-
     };
 
   }])
   
-  .controller('LoginCtrl', ['$scope', 'userService', function( $scope, userService ) {
+  .controller('LoginCtrl', ['$rootScope', '$scope', 'userService', function( $rootScope, $scope, userService ) {
     $scope.authenticate = function( ) {
-        $scope.authenticated = userService.login( $scope.username, $scope.password );
+        $rootScope.authenticated = userService.login( $scope.username, $scope.password );
         
     };
     $scope.logout = function( ) {
