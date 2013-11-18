@@ -14,8 +14,8 @@ block body
 
     div(class="stoplist", ng-show="HotStops", ng-controller="hotStopCtrl")
         ul.HotStops
-            li(ng-repeat="s in HotStops" data-hs=s) {{s.route.Description }} | {{s.direction.Text}} | {{s.stop.Text}}
-                button(class="delete", ng-click="removeHotStop()") [x]
+            li(ng-repeat="s in HotStops") {{s.route.Description }} | {{s.direction.Text}} | {{s.stop.Text}}
+                button(class="delete", ng-click="removeHotStop(s)") [x]
     flash:messages
     div(ng-view)
 

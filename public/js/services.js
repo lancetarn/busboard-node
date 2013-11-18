@@ -40,17 +40,26 @@ angular.module('myApp.services', [])
         },
 
         getHotStops : function( ) {
-            console.log( 'called' );
             return $http({
                 method : 'GET',
                 url : 'api/stops',
             })
             .then( function( rsp ) {
-                console.log(rsp);
                 return rsp.data.HotStops;
             });
-    }
-};
+        },
+
+        removeHotStop : function( stop ) {
+            return $http({
+                method : 'POST',
+                url : 'api/stops/delete',
+                data : stop,
+            })
+            .then( function ( rsp ) {
+                return rsp.data.message;
+            });
+        }
+    };
 }])
 
     .factory('nexTripService', ['$http', function($http) {

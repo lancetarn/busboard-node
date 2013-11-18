@@ -4,13 +4,24 @@
 
 angular.module('myApp.controllers', [])
 
-  .controller('hotStopCtrl', ['$scope', 'userService', function( $scope, userService ) {
+  .controller('hotStopCtrl', ['$scope', 'userService', 'flash', function( $scope, userService, flash ) {
       userService.getHotStops( )
       .then( function( HotStops ) {
-          console.log(HotStops);
           $scope.HotStops = HotStops;
-          console.log($scope);
          });
+
+       $scope.removeHotStop = function( HotStop ) {
+           userService.removeHotStop( HotStop )
+           .then(
+               function( ) {
+                $scope.HotStops.splice( $scope.HotStops.indexOf( HotStop ), 1 );
+                flash( "Stop removed." );
+           },
+                function( ) {
+                    flash( "Sorry, there was an error deleting the stop." );
+           });
+       };
+         
   }])
 
   .controller('RouteCtrl', ['$scope', 'userService', 'nexTripService', 'flash', function($scope, userService, nexTripService, flash ) {
@@ -69,8 +80,14 @@ angular.module('myApp.controllers', [])
         userService.saveHotStop( $scope.HotStop )
         .then( function(rsp) {
             console.log(rsp);
-            flash(rsp.message);
-            $scope = {};
+            flash(rsp.data.message);
+            $scope.routes = null;
+            $scope.stops = null;
+            $scope.directions = null;
+            $scope.selectedRoute = null;
+            $scope.selectedStop = null;
+            $scope.selectedDirection = null;
+            $scope.HotStop = null;
         });
     };
 

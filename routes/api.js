@@ -1,4 +1,7 @@
 /*
  * Serve JSON to our AngularJS client
  */
-exports.apiusers = require( '../users' );
+var mongoBroker = require( '../mongoBroker' );
+var UserModel = require( '../userModel' );
+var UserAPI = require( '../users' );
+exports.userapi = new UserAPI( new UserModel( mongoBroker ) );

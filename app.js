@@ -47,10 +47,11 @@ app.get('/', routes.index);
 app.get('/partials/:name', routes.partials);
 
 // JSON API
-app.post('/api/user', api.apiusers.users.addUser);
-app.post('/api/login', api.apiusers.users.login);
-app.post('/api/stops', api.apiusers.users.addStop);
-app.get('/api/stops', api.apiusers.users.getHotStops);
+app.post('/api/user', api.userapi.addUser.bind(api.userapi));
+app.post('/api/login', api.userapi.login.bind(api.userapi));
+app.post('/api/stops', api.userapi.addStop.bind(api.userapi));
+app.get('/api/stops', api.userapi.getHotStops.bind(api.userapi));
+app.post('/api/stops/delete', api.userapi.removeHotStop.bind(api.userapi));
 
 // redirect all others to the index (HTML5 history)
 app.get('*', routes.index);
