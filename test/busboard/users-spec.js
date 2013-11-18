@@ -1,9 +1,9 @@
 
 
 describe("Users", function( ) {
-
-    var spyModel = jasmine.createSpy('spyModel');
-    spyModel.addStop = jasmine.createSpy('addStop');
+    
+    var spyMethods = ['addStop'];
+    var spyModel = jasmine.createSpyObj( 'spyModel', spyMethods );
     var UserAPI = require("../../users");
     var userAPI = new UserAPI( spyModel );
     var req, res;
@@ -39,19 +39,47 @@ describe("Users", function( ) {
         req.session = {"authenticated" : false};
 
         userAPI.addStop( req, res );
-        expect( res.send ).toHaveBeenCalledWith({"message" : userAPI.noUserMessage, "success" : false});
+        expect( res.send ).toHaveBeenCalledWith({
+            "message" : userAPI.noUserMessage,
+            "success" : false
+        });
     });
 
     it( "Should only save when a stop is posted.", function( ) {
         req.body = undefined;
 
         userAPI.addStop( req, res );
-        expect( res.send ).toHaveBeenCalledWith({"message" : userAPI.noStopMessage, "success" : false});
+        expect( res.send ).toHaveBeenCalledWith({
+            "message" : userAPI.noStopMessage,
+            "success" : false
+        });
     });
 
     it( "Should add the stop if user and stop are present.", function( ) {
         userAPI.addStop( req, res );
-        expect(spyModel.addStop).toHaveBeenCalledWith( req.session.authenticated, testStop );
+
+        expect( spyModel.addStop.mostRecentCall.args[0] )
+        .toEqual( req.session.authenticated );
+        
+        expect( spyModel.addStop.mostRecentCall.args[1] )
+        .toEqual( testStop );
+
+        callback = spyModel.addStop.mostRecentCall.args[2];
+        callback( undefined, 1 );
+        expect( res.send ).toHaveBeenCalledWith( {"message" : 'Stop added.', "success" : true} );
+
+        callback( undefined, 0 );
+        expect( res.send ).toHaveBeenCalledWith(  {"message": "We blew it.", "success" : false} );
+
+        var err =  new Error( "Test addStop error" );
+        var thrown;
+        try {
+            callback( err );
+        }
+        catch ( e ) {
+            thrown = e;
+        }
+        expect( thrown ).toEqual( err );
     });
         
 });

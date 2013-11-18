@@ -28,8 +28,6 @@ UserAPI.prototype.addStop = function (req, res) {
 UserAPI.prototype.login = function (req, res) {
     if ( req.session.authenticated ) res.send({"message" : "Already logged in.", "success" : false});
 
-    console.log( "In function: ",this.model );
-    
     var creds = this.model.getCredsFromReq(req);
     
     this.model.getByName( creds.user, function(err, result) {
