@@ -8,14 +8,8 @@ block body
         a(href='login', ng-hide="authenticated") Login
         a(href='logout', ng-show="authenticated") Logout
       li
-        a(href='mystops') My Stops
-      li
         a(href='register') Register
 
-    div(class="stoplist", ng-show="HotStops", ng-controller="hotStopCtrl")
-        ul.HotStops
-            li(ng-repeat="s in HotStops") {{s.route.Description }} | {{s.direction.Text}} | {{s.stop.Text}}
-                button(class="delete", ng-click="removeHotStop(s)") [x]
     flash:messages
     div(ng-view)
 

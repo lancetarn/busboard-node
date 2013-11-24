@@ -4,7 +4,7 @@
 
 angular.module('myApp.controllers', [])
 
-  .controller('hotStopCtrl', ['$scope', 'userService', 'flash', function( $scope, userService, flash ) {
+  .controller('hotStopCtrl', ['$rootScope', '$scope', 'userService', 'flash', function( $rootScope, $scope, userService, flash ) {
       userService.getHotStops( )
       .then( function( HotStops ) {
           $scope.HotStops = HotStops;
@@ -21,16 +21,19 @@ angular.module('myApp.controllers', [])
                     flash( "Sorry, there was an error deleting the stop." );
            });
        };
-         
+
+       $rootScope.$on( 'saveHotStop', function( e, HotStop ) {
+           console.log( e, HotStop );
+           $scope.HotStops.push( HotStop );
+       });
   }])
 
   .controller('RouteCtrl', ['$scope', 'userService', 'nexTripService', 'flash', function($scope, userService, nexTripService, flash ) {
+    // Grab all known routes from NexTrip.
     $scope.getRoutes = function( ) {
-      // Grab all known routes from NexTrip.
         nexTripService.getRoutes( )
-      .then( function(routes){
-        console.log(routes);
-        $scope.routes = routes;
+        .then( function(routes){
+          $scope.routes = routes;
      });
     };        
 
@@ -38,7 +41,6 @@ angular.module('myApp.controllers', [])
     $scope.getDirections = function( ) {
         nexTripService.getDirections( $scope.selectedRoute )
         .then( function(directions) {
-          console.log(directions);
           $scope.directions = directions;
         });
     };
@@ -47,7 +49,6 @@ angular.module('myApp.controllers', [])
     $scope.getStops = function( ) {
         nexTripService.getStops( $scope.selectedRoute, $scope.selectedDirection )
         .then( function(stops) {
-          console.log(stops);
           $scope.stops = stops;
         });
     };
@@ -79,8 +80,8 @@ angular.module('myApp.controllers', [])
     $scope.saveHotStop = function( ) {
         userService.saveHotStop( $scope.HotStop )
         .then( function(rsp) {
-            console.log(rsp);
             flash(rsp.data.message);
+            $scope.$emit( 'saveHotStop', $scope.HotStop );
             $scope.routes = null;
             $scope.stops = null;
             $scope.directions = null;

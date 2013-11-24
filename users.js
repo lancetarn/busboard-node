@@ -1,13 +1,14 @@
 
 var bcrypt = require('bcrypt');
     
-function UserAPI( UserModel ) {
+function Users( UserModel ) {
     this.model = UserModel;
     this.noUserMessage = "No user found.";
     this.noStopMessage = "Invalid stop received.";
+    this.logoutMessage = "You have successfully logged out.";
 }
 
-UserAPI.prototype.addStop = function (req, res) {
+Users.prototype.addStop = function (req, res) {
     var userId = req.session.authenticated;
 
     if ( ! userId ) return res.send( {"message" : this.noUserMessage, "success" : false} );
@@ -25,7 +26,7 @@ UserAPI.prototype.addStop = function (req, res) {
     });
 };
 
-UserAPI.prototype.login = function (req, res) {
+Users.prototype.login = function (req, res) {
     if ( req.session.authenticated ) res.send({"message" : "Already logged in.", "success" : false});
 
     var creds = this.model.getCredsFromReq(req);
@@ -55,7 +56,15 @@ UserAPI.prototype.login = function (req, res) {
     } );
 };
 
-UserAPI.prototype.addUser = function (req, res) {
+
+Users.prototype.logout = function ( req, res ) {
+    if ( ! req.session.authenticated ) return res.send( {"message" : this.noUserMessage, "success" : false} );
+    req.session.authenticated = null;
+    return res.send( {"message" : this.logoutMessage, "success" : true} );
+};
+
+
+Users.prototype.addUser = function (req, res) {
 
     var pass =  req.body.password,
         username = req.body.username;
@@ -90,7 +99,7 @@ UserAPI.prototype.addUser = function (req, res) {
     });
 };
 
-UserAPI.prototype.getHotStops = function( req, res ) {
+Users.prototype.getHotStops = function( req, res ) {
     var userId = req.session.authenticated;
 
     if (! userId ) return res.send({"message": "You must log in to view stops."});
@@ -105,7 +114,7 @@ UserAPI.prototype.getHotStops = function( req, res ) {
     });
 };
 
-UserAPI.prototype.removeHotStop = function ( req, res ) {
+Users.prototype.removeHotStop = function ( req, res ) {
     var userId = req.session.authenticated;
     this.model.removeHotStop( userId, req.body, function( err, result ) {
         console.log(result);
@@ -117,4 +126,4 @@ UserAPI.prototype.removeHotStop = function ( req, res ) {
     });
 };
 
-module.exports = UserAPI;
+module.exports = Users;

@@ -12,6 +12,7 @@ describe('service', function() {
          service = userService;
         $httpBackend = _$httpBackend_; 
         $httpBackend.when( 'POST', 'api/stops' ).respond( {"data":mockStop} );
+        $httpBackend.when( 'DELETE', '/api/logout' ).respond( {"data" : {"message" : "logged out", "success" : true}} );
       }));
 
       // Mock up localStorage
@@ -33,15 +34,23 @@ describe('service', function() {
           });
       });
 
+      afterEach( function( ) {
+          $httpBackend.flush( );
+      });
+
         it('should call $http with proper config', function( ) {
             $httpBackend.expectPOST( 'api/stops', mockStop );
             service.saveHotStop( mockStop );
-            $httpBackend.flush( );
         });
         
         it('should try to store the stop locally', function( ) {
             service.saveHotStop( mockStop );
             expect( localStorage.setItem ).toHaveBeenCalledWith( service.getStoragePrefix( ) + mockStop.route.Route, mockStop );
+        });
+
+        it( 'should log the user out', function( ) {
+            $httpBackend.expect( 'DELETE', '/api/logout' );
+            service.logout( );
         });
     });
 });

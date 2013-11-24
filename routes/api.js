@@ -3,5 +3,5 @@
  */
 var mongoBroker = require( '../mongoBroker' );
 var UserModel = require( '../userModel' );
-var UserAPI = require( '../users' );
-exports.userapi = new UserAPI( new UserModel( mongoBroker ) );
+var Users = require( '../users' );
+exports.users = new Users( new UserModel( mongoBroker ) );

@@ -4,8 +4,8 @@ describe("Users", function( ) {
     
     var spyMethods = ['addStop'];
     var spyModel = jasmine.createSpyObj( 'spyModel', spyMethods );
-    var UserAPI = require("../../users");
-    var userAPI = new UserAPI( spyModel );
+    var User = require("../../users");
+    var user = new User( spyModel );
     var req, res;
 
     var testStop = {
@@ -38,9 +38,9 @@ describe("Users", function( ) {
 
         req.session = {"authenticated" : false};
 
-        userAPI.addStop( req, res );
+        user.addStop( req, res );
         expect( res.send ).toHaveBeenCalledWith({
-            "message" : userAPI.noUserMessage,
+            "message" : user.noUserMessage,
             "success" : false
         });
     });
@@ -48,15 +48,15 @@ describe("Users", function( ) {
     it( "Should only save when a stop is posted.", function( ) {
         req.body = undefined;
 
-        userAPI.addStop( req, res );
+        user.addStop( req, res );
         expect( res.send ).toHaveBeenCalledWith({
-            "message" : userAPI.noStopMessage,
+            "message" : user.noStopMessage,
             "success" : false
         });
     });
 
     it( "Should add the stop if user and stop are present.", function( ) {
-        userAPI.addStop( req, res );
+        user.addStop( req, res );
 
         expect( spyModel.addStop.mostRecentCall.args[0] )
         .toEqual( req.session.authenticated );
@@ -80,6 +80,18 @@ describe("Users", function( ) {
             thrown = e;
         }
         expect( thrown ).toEqual( err );
+    });
+
+    it( "Should destroy the session on logout", function( ) {
+        user.logout( req, res );
+        expect( req.session.authenticated ).toEqual( null );
+        expect( res.send ).toHaveBeenCalledWith( {"message" : user.logoutMessage, "success" : true} );
+    });
+
+    it( "Should report failure if there is no authenticated session", function( ) {
+        req.session.authenticated = null;
+        user.logout( req, res );
+        expect( res.send ).toHaveBeenCalledWith( {"message" : user.noUserMessage, "success" : false} );
     });
         
 });

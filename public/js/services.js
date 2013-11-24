@@ -17,7 +17,17 @@ angular.module('myApp.services', [])
             } );
         },
 
-        logout : function( ) { alert( 'logged out!' ); },
+        logout : function( ) {
+            var config = {
+                method : 'DELETE',
+                url : '/api/logout',
+            };
+
+            return $http( config )
+                .success( function( data, status, headres, config ) {
+                    return data;
+                });
+        },
 
         addUser : function( username, password ) {
             return $http({

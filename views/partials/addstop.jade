@@ -12,3 +12,8 @@ select.stop(ng-model="selectedStop", ng-show="stops", ng-options="s.Text for s i
 div(ng-show="selectedRoute && selectedDirection && selectedStop")
     button(ng-click="saveHotStop()") Save Stop
     button(ng-click="getDepartures()") View Departures
+
+div(class="stoplist", ng-show="HotStops", ng-controller="hotStopCtrl")
+    ul.HotStops
+        li(ng-repeat="s in HotStops") {{s.route.Description }} | {{s.direction.Text}} | {{s.stop.Text}}
+            button(class="delete", ng-click="removeHotStop(s)") [x]
