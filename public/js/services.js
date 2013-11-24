@@ -4,6 +4,7 @@
 
 angular.module('myApp.services', [])
   .factory('userService', ['$http', function($http) {
+    var storagePrefix = 'hotstop_';
     return {
         login : function( username, password ) {
             var config = {
@@ -30,6 +31,9 @@ angular.module('myApp.services', [])
         },
 
         saveHotStop : function( HotStop ) {
+            if ( localStorage ) {
+                localStorage.setItem( storagePrefix + HotStop.route.Route, HotStop );
+            }
             
             var config = {
                 method : 'POST',
@@ -58,6 +62,10 @@ angular.module('myApp.services', [])
             .then( function ( rsp ) {
                 return rsp.data.message;
             });
+        },
+
+        getStoragePrefix : function( ) {
+            return storagePrefix;
         }
     };
 }])
