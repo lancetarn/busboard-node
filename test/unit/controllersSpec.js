@@ -8,8 +8,6 @@ describe('controllers', function(){
 
   var mockService = {
       login : function( user, pass ) {
-          console.log( 'called login', user, pass );
-          console.log(user + pass );
           return user + pass;
       },
 
@@ -20,7 +18,7 @@ describe('controllers', function(){
 
   beforeEach(module('myApp.controllers'));
 
-  beforeEach(inject(function($rootScope, $controller) {
+  beforeEach(inject(function($rootScope, $controller, flash) {
       $scope = $rootScope.$new();
       $scope.username = 'foo';
       $scope.password = 'bar';
@@ -28,6 +26,7 @@ describe('controllers', function(){
       ctrl = $controller('LoginCtrl', { 
           $scope: $scope,
           userService : mockService,
+          flash : flash
       });
   }));
 

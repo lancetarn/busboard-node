@@ -49,6 +49,7 @@ app.get('/partials/:name', routes.partials);
 // JSON API
 app.post('/api/user', api.users.addUser.bind(api.users));
 app.post('/api/login', api.users.login.bind(api.users));
+app.delete('/api/logout', api.users.logout.bind(api.users));
 app.post('/api/stops', api.users.addStop.bind(api.users));
 app.get('/api/stops', api.users.getHotStops.bind(api.users));
 app.post('/api/stops/delete', api.users.removeHotStop.bind(api.users));

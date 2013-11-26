@@ -1,4 +1,4 @@
-button(ng-click="getRoutes()") Add Stop
+button(ng-click="getRoutes()", ng-hide="routes") Add Stop
 
 select.route(ng-model="selectedRoute", ng-show="routes", ng-change="getDirections()", ng-options="r.Description for r in routes")
         option(value="") Select route...

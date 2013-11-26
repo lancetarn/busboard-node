@@ -27,7 +27,8 @@ Users.prototype.addStop = function (req, res) {
 };
 
 Users.prototype.login = function (req, res) {
-    if ( req.session.authenticated ) res.send({"message" : "Already logged in.", "success" : false});
+    console.log( req.session.authenticated );
+    if ( req.session.authenticated ) res.send({"message" : "Already logged in.", "success" : true});
 
     var creds = this.model.getCredsFromReq(req);
     
@@ -59,7 +60,10 @@ Users.prototype.login = function (req, res) {
 
 Users.prototype.logout = function ( req, res ) {
     if ( ! req.session.authenticated ) return res.send( {"message" : this.noUserMessage, "success" : false} );
+
     req.session.authenticated = null;
+    res.clearCookie( 'authenticated' );
+    req.session.destroy( function( ) { } );
     return res.send( {"message" : this.logoutMessage, "success" : true} );
 };
 

@@ -12,8 +12,8 @@ angular.module('myApp.services', [])
                 url : 'api/login',
                 data : {"username" : username, "password" : password}
             };
-            return $http(config).success( function(data, status, headers, config) {
-                return data;
+            return $http(config).then( function( rsp ) {
+                return rsp.data;
             } );
         },
 

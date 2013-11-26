@@ -11,15 +11,12 @@ angular.module('myApp', [
 config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
   $routeProvider.
     when('/', {
-        controller: 'IndexCtrl'
+      templateUrl: 'partials/addstop',
+      controller: 'RouteCtrl'
     }).
     when('/login', {
       templateUrl: 'partials/login',
       controller: 'LoginCtrl'
-    }).
-    when('/mystops', {
-      templateUrl: 'partials/addstop',
-      controller: 'RouteCtrl'
     }).
     when('/register', {
         templateUrl: 'partials/register',

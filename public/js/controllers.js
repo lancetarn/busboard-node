@@ -23,7 +23,6 @@ angular.module('myApp.controllers', [])
        };
 
        $rootScope.$on( 'saveHotStop', function( e, HotStop ) {
-           console.log( e, HotStop );
            $scope.HotStops.push( HotStop );
        });
   }])
@@ -94,15 +93,24 @@ angular.module('myApp.controllers', [])
 
   }])
   
-  .controller('LoginCtrl', ['$rootScope', '$scope', 'userService', function( $rootScope, $scope, userService ) {
+  .controller('LoginCtrl', ['$rootScope', '$scope', '$location', 'userService', 'flash', function( $rootScope, $scope, $location, userService, flash ) {
     $scope.authenticate = function( ) {
-        $rootScope.authenticated = userService.login( $scope.username, $scope.password );
-        
+        userService.login( $scope.username, $scope.password )
+        .then( function( data ) {
+            console.log( data );
+            var path = data.success ? '/' : '/login';
+            $rootScope.authenticated = data.success;
+            flash( data.message );
+            $location.path( path );
+        });
     };
+
     $scope.logout = function( ) {
         userService.logout( );
+        $rootScope.authenticated = false;
     };
   }])
+
 
   .controller('RegisterCtrl', ['$scope', '$location', 'userService', 'flash', function( $scope, $location, userService, flash ) {
     $scope.addUser = function( ) {

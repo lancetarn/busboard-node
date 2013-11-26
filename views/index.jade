@@ -6,7 +6,7 @@ block body
     ul.menu
       li
         a(href='login', ng-hide="authenticated") Login
-        a(href='logout', ng-show="authenticated") Logout
+        a(href='logout', ng-controller="LoginCtrl", ng-click='logout()', ng-show="authenticated") Logout
       li
         a(href='register') Register
 
