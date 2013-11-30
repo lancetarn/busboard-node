@@ -39,7 +39,9 @@ module.exports = {
    },
 
    find : function( collName, query, fields, callback ) {
+        console.log( collName );
      var collection = broker.collection(collName);
+     console.log( collection );
      collection.find(query, fields).toArray( function(err, result) {
         if (err) return callback(err);
         

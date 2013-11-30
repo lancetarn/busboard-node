@@ -1,11 +1,14 @@
 
 var bcrypt = require('bcrypt');
+
     
 function Users( UserModel ) {
     this.model = UserModel;
     this.noUserMessage = "No user found.";
     this.noStopMessage = "Invalid stop received.";
     this.logoutMessage = "You have successfully logged out.";
+    this.userAddedMessage = "Welcome to busboard, ";
+    this.userAlreadyExistsMessage = "Sorry, that username is in use.";
 }
 
 Users.prototype.addStop = function (req, res) {
@@ -70,37 +73,16 @@ Users.prototype.logout = function ( req, res ) {
 
 Users.prototype.addUser = function (req, res) {
 
-    var pass =  req.body.password,
-        username = req.body.username;
+    var pass =  req.body.password;
+    var username = req.body.username;
 
-    mongoBroker.find( 'user', {"username" : username}, undefined, function(err, result) {
-        if (err) throw err;
+    this.model.addUser( username, pass, ( function( result ) {
 
-        if ( result.length > 0 ) return res.send({
-            "message" : "Sorry, that username is already in use.",
-            "success" : false
-            });
+        result.message  =  result.success ? this.userAddedMessage :
+            this.userAlreadyExistsMessage;
 
-        bcrypt.hash( req.body.password, 5, function(err, hash) {
-            if (err) throw err;
-
-            var user = { 
-                'username' : username,
-                'password' : hash,
-                'joined' : new Date(),
-                'modified' : new Date(),
-                'HotStops' : []
-            };
-
-            mongoBroker.insert('user', user, function(err, result) {
-                if (err) res.send({'error' : err});
-
-                console.log("Added user '" + user.username +"'");
-                res.send({"success" : true});
-                
-            });
-        });
-    });
+        return res.send( result );
+    }).bind( this ) );
 };
 
 Users.prototype.getHotStops = function( req, res ) {

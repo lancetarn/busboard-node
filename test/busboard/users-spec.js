@@ -24,6 +24,14 @@ describe("Users", function( ) {
         }
     };
 
+    var testUser = {
+        "username" : "testuser",
+        "password" : "testpass",
+        "joined" : new Date( ),
+        "modified" : new Date( ),
+        "HotStops" : []
+    };
+
     beforeEach( function( ) {
 
         req = jasmine.createSpy('spyreq');
@@ -34,24 +42,27 @@ describe("Users", function( ) {
         res.send = jasmine.createSpy('spySend');
     });
 
-    it( "Should only save stops when user is logged in.", function( ) {    
+    describe( 'addStop', function ( ) {
 
-        req.session = {"authenticated" : false};
+        it( "Should only save stops when user is logged in.", function( ) {
 
-        user.addStop( req, res );
-        expect( res.send ).toHaveBeenCalledWith({
-            "message" : user.noUserMessage,
-            "success" : false
+            req.session = {"authenticated" : false};
+
+            user.addStop( req, res );
+            expect( res.send ).toHaveBeenCalledWith({
+                "message" : user.noUserMessage,
+                "success" : false
+            });
         });
-    });
 
-    it( "Should only save when a stop is posted.", function( ) {
-        req.body = undefined;
+        it( "Should only save when a stop is posted.", function( ) {
+            req.body = undefined;
 
-        user.addStop( req, res );
-        expect( res.send ).toHaveBeenCalledWith({
-            "message" : user.noStopMessage,
-            "success" : false
+            user.addStop( req, res );
+            expect( res.send ).toHaveBeenCalledWith({
+                "message" : user.noStopMessage,
+                "success" : false
+            });
         });
     });
 
@@ -60,7 +71,7 @@ describe("Users", function( ) {
 
         expect( spyModel.addStop.mostRecentCall.args[0] )
         .toEqual( req.session.authenticated );
-        
+
         expect( spyModel.addStop.mostRecentCall.args[1] )
         .toEqual( testStop );
 
@@ -82,18 +93,53 @@ describe("Users", function( ) {
         expect( thrown ).toEqual( err );
     });
 
-    it( "Should destroy the session on logout", function( ) {
-        user.logout( req, res );
-        expect( req.session.authenticated ).toEqual( null );
-        expect( res.send ).toHaveBeenCalledWith( {"message" : user.logoutMessage, "success" : true} );
+    xdescribe( 'logout', function( ) {
+        it( "Should destroy the session on logout", function( ) {
+            user.logout( req, res );
+            expect( req.session.authenticated ).toEqual( null );
+            expect( res.send ).toHaveBeenCalledWith( {"message" : user.logoutMessage, "success" : true} );
+        });
+
+        it( "Should report failure if there is no authenticated session", function( ) {
+            req.session.authenticated = null;
+            user.logout( req, res );
+            expect( res.send ).toHaveBeenCalledWith( {"message" : user.noUserMessage, "success" : false} );
+        });
     });
 
-    it( "Should report failure if there is no authenticated session", function( ) {
-        req.session.authenticated = null;
-        user.logout( req, res );
-        expect( res.send ).toHaveBeenCalledWith( {"message" : user.noUserMessage, "success" : false} );
-    });
+    describe( 'addUser', function( ) {
         
+        beforeEach( function ( ) {
+            req.body.username  =  "testuser";
+            req.body.password  =  "testpass";
+
+        });
+
+        it( "should call on the model with posted credentials", function( ) {
+
+            // Call the callback with current state of result
+            var result = {"success" : true};
+            spyModel.addUser = function( ) {};
+            spyOn( spyModel, 'addUser' ).andCallFake( function( ) {
+                spyModel.addUser.mostRecentCall.args[2]( result );
+            });
+
+            user.addUser( req, res );
+
+            expect( spyModel.addUser.mostRecentCall.args[0] )
+            .toEqual( req.body.username );
+
+            expect( spyModel.addUser.mostRecentCall.args[1] )
+            .toEqual( req.body.password );
+
+            expect( res.send ).toHaveBeenCalledWith( {"message" : user.userAddedMessage, "success" : true } );
+
+        });
+
+        it( "should respond with user exists on model fail", function( ) { } );
+
+
+    });
 });
     
 
