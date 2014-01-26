@@ -24,7 +24,7 @@ angular.module('myApp.services', [])
             };
 
             return $http( config )
-                .success( function( data, status, headres, config ) {
+                .success( function( data, status, headers, config ) {
                     return data;
                 });
         },

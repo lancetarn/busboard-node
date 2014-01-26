@@ -119,7 +119,7 @@ angular.module('myApp.controllers', [])
             console.log( resp );
             if ( resp.data.success ) {
                 flash("Thanks for registering!");
-                $location.path("/login");
+                $location.path("/");
             }
             else {
                 flash(resp.data.message);
