@@ -29,9 +29,7 @@ angular.module('myApp.controllers', [])
        });
   }])
 
-  .controller('RouteCtrl', [ '$scope', 'userService', 'nexTripService', 'flash', function( $rootScope, $scope, userService, nexTripService, flash ) {
-
-	$scope.authenticated = $rootScope.authenticated;
+  .controller('RouteCtrl', [ '$scope', 'userService', 'nexTripService', 'flash', function( $scope, userService, nexTripService, flash ) {
 
     // Grab all known routes from NexTrip.
     $scope.getRoutes = function( ) {
@@ -39,7 +37,7 @@ angular.module('myApp.controllers', [])
         .then( function(routes){
           $scope.routes = routes;
      });
-    };        
+    };
 
     // Get the directions available for a given route.
     $scope.getDirections = function( ) {
@@ -139,8 +137,6 @@ angular.module('myApp.controllers', [])
   }])
   
   .controller('IndexCtrl', ['$rootScope', '$scope', 'flash', function( $rootScope, $scope, flash ) {
-	  console.log( $scope );
-	  $scope.authenticated = $rootScope.authenticated;
   }]);
 
 
