@@ -23,10 +23,7 @@ angular.module('myApp.services', [])
                 url : '/api/logout',
             };
 
-            return $http( config )
-                .success( function( data, status, headers, config ) {
-                    return data;
-                });
+            return $http( config );
         },
 
         addUser : function( username, password ) {
@@ -40,11 +37,17 @@ angular.module('myApp.services', [])
             });
         },
 
+        // Save a stop into an array in localStorage,
+        // then POST it.
         saveHotStop : function( HotStop ) {
+
             if ( localStorage ) {
-                localStorage.setItem( storagePrefix + HotStop.route.Route, HotStop );
+                var stops = localStorage.getItem( storagePrefix );
+                stops = stops || [];
+                stops.push( HotStop );
+                localStorage.setItem( storagePrefix, JSON.stringify( stops ) );
             }
-            
+
             var config = {
                 method : 'POST',
                 url : 'api/stops',
@@ -53,12 +56,26 @@ angular.module('myApp.services', [])
             return $http(config);
         },
 
+        getLocalStops : function( ) {
+            if ( localStorage ) {
+                return JSON.pars( localStorage.getItem( storagePrefix ) );
+            }
+            return false;
+                        },
+
+        // Gets stops, syncs localStorage
         getHotStops : function( ) {
+
             return $http({
                 method : 'GET',
                 url : 'api/stops',
             })
             .then( function( rsp ) {
+
+                if ( rsp.data.HotStops && localStorage ) {
+                    localStorage.setItem( storagePrefix, JSON.stringify( rsp.data.HotStops ) );
+                }
+
                 return rsp.data.HotStops;
             });
         },

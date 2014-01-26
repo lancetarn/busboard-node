@@ -11,6 +11,7 @@ function Users( UserModel ) {
     this.userAlreadyExistsMessage = "Sorry, that username is in use.";
 }
 
+// Save a stop to the user if user is found.
 Users.prototype.addStop = function (req, res) {
     var userId = req.session.authenticated;
 
@@ -80,21 +81,16 @@ Users.prototype.addUser = function (req, res) {
     var username = req.body.username;
 
     this.model.addUser( username, pass, ( function( err, result ) {
-        if ( err ) { 
-            return res.send( {
-                "message" : "Sorry, there was a problem registering you.",
-                "success" : false
-            });
-        }
+        if ( err ) throw err;
 
         var response  =  {};
         if ( result.duplicate ) {
              response.message = this.userAlreadyExistsMessage;
         }
         else {
-            response.message = this.userAddedMessage; 
             response.success = true;
             response.user = result[0];
+            response.message = this.userAddedMessage + ' ' + response.user.username;
             req.session.authenticated  =  result[0]._id;
         }
 

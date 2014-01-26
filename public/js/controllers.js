@@ -23,11 +23,16 @@ angular.module('myApp.controllers', [])
        };
 
        $rootScope.$on( 'saveHotStop', function( e, HotStop ) {
-           $scope.HotStops.push( HotStop );
+			$scope.HotStops = $scope.HotStops || [];
+			$scope.HotStops.push( HotStop );
+
        });
   }])
 
-  .controller('RouteCtrl', ['$scope', 'userService', 'nexTripService', 'flash', function($scope, userService, nexTripService, flash ) {
+  .controller('RouteCtrl', [ '$scope', 'userService', 'nexTripService', 'flash', function( $rootScope, $scope, userService, nexTripService, flash ) {
+
+	$scope.authenticated = $rootScope.authenticated;
+
     // Grab all known routes from NexTrip.
     $scope.getRoutes = function( ) {
         nexTripService.getRoutes( )
@@ -47,7 +52,7 @@ angular.module('myApp.controllers', [])
     // Get the stops for a given route, ordered by direction.
     $scope.getStops = function( ) {
         nexTripService.getStops( $scope.selectedRoute, $scope.selectedDirection )
-        .then( function(stops) {
+        .then( function( stops ) {
           $scope.stops = stops;
         });
     };
@@ -58,7 +63,7 @@ angular.module('myApp.controllers', [])
              $scope.selectedDirection.Value &&
              $scope.selectedStop.Value
            ) {
-            $scope.HotStop = { 
+            $scope.HotStop = {
                 route : $scope.selectedRoute,
                 direction : $scope.selectedDirection,
                 stop : $scope.selectedStop
@@ -69,7 +74,7 @@ angular.module('myApp.controllers', [])
     // Get departures for the set HotStop from nexTrip.
     $scope.getDepartures = function( ) {
         nexTripService.getDepartures($scope.HotStop)
-        .then( function(departures) {
+        .then( function( departures ) {
             console.log(departures);
             $scope.departures = departures;
         });
@@ -78,8 +83,8 @@ angular.module('myApp.controllers', [])
     // Save the set HotStop to the user.
     $scope.saveHotStop = function( ) {
         userService.saveHotStop( $scope.HotStop )
-        .then( function(rsp) {
-            flash(rsp.data.message);
+        .then( function( rsp ) {
+            flash( rsp.data.message );
             $scope.$emit( 'saveHotStop', $scope.HotStop );
             $scope.routes = null;
             $scope.stops = null;
@@ -106,19 +111,24 @@ angular.module('myApp.controllers', [])
     };
 
     $scope.logout = function( ) {
-        userService.logout( );
-        $rootScope.authenticated = false;
+     	userService.logout( )
+		.then( function( resp ) {
+			console.log( resp );
+			flash( resp.data.message );
+			$rootScope.authenticated = false;
+		});
     };
   }])
 
 
-  .controller('RegisterCtrl', ['$scope', '$location', 'userService', 'flash', function( $scope, $location, userService, flash ) {
+  .controller('RegisterCtrl', ['$rootScope', '$scope', '$location', 'userService', 'flash', function( $rootScope, $scope, $location, userService, flash ) {
     $scope.addUser = function( ) {
         var result = userService.addUser( $scope.newuser, $scope.newpass );
-        result.then( function(resp) {
+        result.then( function( resp ) {
             console.log( resp );
             if ( resp.data.success ) {
-                flash("Thanks for registering!");
+                flash( resp.data.message );
+				$rootScope.authenticated = resp.data.success;
                 $location.path("/");
             }
             else {
@@ -128,7 +138,9 @@ angular.module('myApp.controllers', [])
     };
   }])
   
-  .controller('IndexCtrl', ['$scope', 'flash', function( $scope ) {
+  .controller('IndexCtrl', ['$rootScope', '$scope', 'flash', function( $rootScope, $scope, flash ) {
+	  console.log( $scope );
+	  $scope.authenticated = $rootScope.authenticated;
   }]);
 
-  
+
