@@ -96,14 +96,14 @@ angular.module('myApp.controllers', [])
 
   }])
   
-  .controller('LoginCtrl', ['$rootScope', '$scope', '$location', 'userService', 'flash', function( $rootScope, $scope, $location, userService, flash ) {
+  .controller('LoginCtrl', [ '$scope', '$location', 'userService', 'flash', function( $scope, $location, userService, flash ) {
+	$scope.authenticated = userService.isAuthenticated( );
+
     $scope.authenticate = function( ) {
         userService.login( $scope.username, $scope.password )
-        .then( function( data ) {
-            console.log( data );
-            var path = data.success ? '/' : '/login';
-            $rootScope.authenticated = data.success;
-            flash( data.message );
+        .then( function( rsp ) {
+            var path = rsp.data.success ? '/' : '/login';
+            flash( rsp.data.message );
             $location.path( path );
         });
     };
@@ -113,7 +113,6 @@ angular.module('myApp.controllers', [])
 		.then( function( resp ) {
 			console.log( resp );
 			flash( resp.data.message );
-			$rootScope.authenticated = false;
 		});
     };
   }])

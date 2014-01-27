@@ -37,7 +37,7 @@ Users.prototype.login = function (req, res) {
 
     var creds = this.model.getCredsFromReq(req);
     
-    // Try to find the user. 
+    // Try to find the user.
     this.model.getByName( creds.user, function(err, result) {
         if ( err ) throw err;
 
@@ -50,15 +50,16 @@ Users.prototype.login = function (req, res) {
         var user = result[0];
 
         // Found one and only one user. Check pass with bcrypt, send result.
-        bcrypt.compare( creds.pass, user.password, function(err, same) {
+        bcrypt.compare( creds.pass, user.password, function( err, match ) {
             if (err) throw err;
 
             req.session.authenticated = user._id;
 
             return res.send( {
-            "success" : same, 
-            "message" : same ? 'Welcome back, ' + user.username + '!'
-            : 'Sorry, that password does not match that username.'
+				"success" : match,
+				"username" : user.username,
+				"message" : match ? 'Welcome back, ' + user.username + '!'
+				: 'Sorry, that password does not match that username.'
             });
         });
     });

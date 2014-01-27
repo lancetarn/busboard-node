@@ -12,9 +12,11 @@ angular.module('myApp.services', [])
                 url : 'api/login',
                 data : {"username" : username, "password" : password}
             };
-            return $http(config).then( function( rsp ) {
-                return rsp.data;
-            } );
+            return $http( config ).success( ( function( rsp ) {
+                console.log( rsp );
+                this.authenticated = true;
+                this.username = rsp.username ? rsp.username : '';
+                } ).bind( this ) );
         },
 
         logout : function( ) {
@@ -23,8 +25,15 @@ angular.module('myApp.services', [])
                 url : '/api/logout',
             };
 
-            return $http( config );
+            return $http( config ).success( ( function( rsp ) {
+                this.authenticated = false;
+                this.username = '';
+            }).bind( this ) );
         },
+
+        isAuthenticated : function( ) {
+                              return this.authenticated;
+                          },
 
         addUser : function( username, password ) {
             return $http({
