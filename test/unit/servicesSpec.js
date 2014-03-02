@@ -57,6 +57,11 @@ describe('service', function() {
             service.logout( );
         });
 
+		it( 'should try to get the current user' , function( ) {
+			$httpBackend.expect( 'GET', '/api/user' ).respond( {"data": {"user" : "foo"} } );
+			service.getSessionUser( );
+		});
+
 		
     });
 });
