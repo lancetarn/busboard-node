@@ -23,9 +23,12 @@ describe('service', function() {
               "direction" : "NORTHBOUND",
               "stop" : "TEST STOP"
           };
-          spyOn(localStorage, 'getItem').andCallFake(function (key) {
-            return store[key];
-          });
+			spyOn(localStorage, 'getItem').andCallFake(function (key) {
+				if ( store[key] ) {
+					return store[key];
+				}
+				return null;
+			});
           spyOn(localStorage, 'setItem').andCallFake(function (key, value) {
             return store[key] = value + '';
           });
@@ -38,14 +41,16 @@ describe('service', function() {
           $httpBackend.flush( );
       });
 
-        it('should call $http with proper config', function( ) {
-            $httpBackend.expectPOST( 'api/stops', mockStop );
-            service.saveHotStop( mockStop );
-        });
+
+		it('should call $http with proper config', function( ) {
+			$httpBackend.expectPOST( 'api/stops', mockStop );
+			console.log(mockStop);
+			service.saveHotStop( mockStop );
+		});
         
         it('should try to store the stop locally', function( ) {
             service.saveHotStop( mockStop );
-            expect( localStorage.setItem ).toHaveBeenCalledWith( service.getStoragePrefix( ) + mockStop.route.Route, mockStop );
+            expect( localStorage.setItem ).toHaveBeenCalledWith( service.getStorageKey( ), JSON.stringify( [mockStop] ) );
         });
 
         it( 'should log the user out', function( ) {

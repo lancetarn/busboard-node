@@ -3,8 +3,8 @@
 /* Services */
 
 angular.module('myApp.services', [])
-  .factory('userService', ['$http', function($http) {
-    var storagePrefix = 'hotstop_';
+  .factory('userService', ['$rootScope', '$http', function( $rootScope, $http) {
+    var storageKey = 'hotstop_';
     return {
         login : function( username, password ) {
             var config = {
@@ -12,28 +12,28 @@ angular.module('myApp.services', [])
                 url : 'api/login',
                 data : {"username" : username, "password" : password}
             };
-            return $http( config ).success( ( function( rsp ) {
-                console.log( rsp );
-                this.authenticated = true;
-                this.username = rsp.username ? rsp.username : '';
-                } ).bind( this ) );
-        },
+            return $http( config );
+				},
 
-        logout : function( ) {
-            var config = {
-                method : 'DELETE',
-                url : '/api/logout',
-            };
+		logout : function( ) {
+			var config = {
+				method : 'DELETE',
+				url : '/api/logout',
+			};
 
-            return $http( config ).success( ( function( rsp ) {
-                this.authenticated = false;
-                this.username = '';
-            }).bind( this ) );
-        },
+			return $http( config );
+		},
 
-        isAuthenticated : function( ) {
-                              return this.authenticated;
-                          },
+		setSessionUser : function( ) {
+			var config = {
+				method : 'GET',
+				url : '/api/user',
+			};
+			return $http( config ).then( function( rsp ) {
+			console.log( rsp );
+			$rootScope.user  =  rsp.data.user;
+			});
+		},
 
         addUser : function( username, password ) {
             return $http({
@@ -51,10 +51,12 @@ angular.module('myApp.services', [])
         saveHotStop : function( HotStop ) {
 
             if ( localStorage ) {
-                var stops = localStorage.getItem( storagePrefix );
+				var stopJSON  =  localStorage.getItem( storageKey );
+				console.log( stopJSON );
+                var stops = JSON.parse( stopJSON );
                 stops = stops || [];
                 stops.push( HotStop );
-                localStorage.setItem( storagePrefix, JSON.stringify( stops ) );
+                localStorage.setItem( storageKey, JSON.stringify( stops ) );
             }
 
             var config = {
@@ -67,7 +69,7 @@ angular.module('myApp.services', [])
 
         getLocalStops : function( ) {
             if ( localStorage ) {
-                return JSON.pars( localStorage.getItem( storagePrefix ) );
+                return JSON.pars( localStorage.getItem( storageKey ) );
             }
             return false;
                         },
@@ -82,7 +84,7 @@ angular.module('myApp.services', [])
             .then( function( rsp ) {
 
                 if ( rsp.data.HotStops && localStorage ) {
-                    localStorage.setItem( storagePrefix, JSON.stringify( rsp.data.HotStops ) );
+                    localStorage.setItem( storageKey, JSON.stringify( rsp.data.HotStops ) );
                 }
 
                 return rsp.data.HotStops;
@@ -100,8 +102,8 @@ angular.module('myApp.services', [])
             });
         },
 
-        getStoragePrefix : function( ) {
-            return storagePrefix;
+        getStorageKey : function( ) {
+            return storageKey;
         }
     };
 }])
@@ -145,4 +147,3 @@ angular.module('myApp.services', [])
             }
         };
     }]);
-            
