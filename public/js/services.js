@@ -24,22 +24,21 @@ angular.module('myApp.services', [])
 			return $http( config );
 		},
 
-		setSessionUser : function( ) {
+		getSessionUser : function( ) {
 			var config = {
 				method : 'GET',
 				url : '/api/user',
 			};
 			return $http( config ).then( function( rsp ) {
-			console.log( rsp );
-			$rootScope.user  =  rsp.data.user;
+				return  rsp.data.user;
 			});
 		},
 
         addUser : function( username, password ) {
             return $http({
-                method : 'POST',
-                url : '/api/user',
-                data : {"username" : username, "password" : password}
+                method  :  'POST',
+                url     :  '/api/user',
+                data    :  {"username" : username, "password" : password}
                 } )
             .success(function(data, status, headers, config) {
                 return data.message;
@@ -52,7 +51,6 @@ angular.module('myApp.services', [])
 
             if ( localStorage ) {
 				var stopJSON  =  localStorage.getItem( storageKey );
-				console.log( stopJSON );
                 var stops = JSON.parse( stopJSON );
                 stops = stops || [];
                 stops.push( HotStop );

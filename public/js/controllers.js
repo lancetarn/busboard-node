@@ -100,6 +100,14 @@ angular.module('myApp.controllers', [])
 	}])
 
 	.controller('LoginCtrl', [ '$rootScope', '$scope', '$location', 'userService', 'flash', function( $rootScope, $scope, $location, userService, flash ) {
+
+	// Check for session on initial pageload.
+	userService.getSessionUser( )
+	.then( function ( user ) {
+		console.log( user );
+		$rootScope.user  =  user;
+	});
+
 	
 	$scope.authenticate = function( ) {
 		userService.login( $scope.username, $scope.password )
@@ -107,7 +115,7 @@ angular.module('myApp.controllers', [])
 			var path;
 			if ( rsp.data.success ) {
 				path = '/';
-				$rootScope.user = rsp.data.user;
+				$rootScope.user  =  rsp.data.user;
 			}
 			else {
 				path = '/login';
@@ -120,7 +128,7 @@ angular.module('myApp.controllers', [])
 	$scope.logout = function( ) {
 		userService.logout( )
 		.then( function( resp ) {
-			$rootScope.user = false;
+			$rootScope.user  =  false;
 			flash( resp.data.message );
 		});
 	};

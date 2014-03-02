@@ -23,6 +23,8 @@ describe('controllers', function(){
 			$scope.username  =  'foo';
 			$scope.password  =  'bar';
 
+			spyOn( userService, 'getSessionUser' ).andReturn( $q.defer( ).promise );
+
 			ctrl = $controller('LoginCtrl', {
 				$scope       :  $scope,
 				userService  :  userService,
