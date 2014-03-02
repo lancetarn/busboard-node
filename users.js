@@ -11,6 +11,7 @@ function Users( UserModel ) {
     this.userAlreadyExistsMessage = "Sorry, that username is in use.";
 }
 
+// Save a stop to the user if user is found.
 Users.prototype.addStop = function (req, res) {
     var userId = req.session.authenticated;
 
@@ -29,23 +30,26 @@ Users.prototype.addStop = function (req, res) {
     });
 };
 
+// Verify credentials, set session user to user._id
 Users.prototype.login = function (req, res) {
     console.log( req.session.authenticated );
     if ( req.session.authenticated ) res.send({"message" : "Already logged in.", "success" : true});
 
     var creds = this.model.getCredsFromReq(req);
     
+    // Try to find the user. 
     this.model.getByName( creds.user, function(err, result) {
-        if (err) throw err;
+        if ( err ) throw err;
 
         if ( result.length > 1 ) throw new Error( 'Found non-unique username: ' + creds.user );
         
         if ( result.length === 0 ) {
-            return res.send( {"message" : 'User not found.', "success" : false} );
+            return res.send( {"message" : 'Found no user by that name.', "success" : false} );
         }
 
         var user = result[0];
 
+        // Found one and only one user. Check pass with bcrypt, send result.
         bcrypt.compare( creds.pass, user.password, function(err, same) {
             if (err) throw err;
 
@@ -55,9 +59,9 @@ Users.prototype.login = function (req, res) {
             "success" : same, 
             "message" : same ? 'Welcome back, ' + user.username + '!'
             : 'Sorry, that password does not match that username.'
-            } );
-        } );
-    } );
+            });
+        });
+    });
 };
 
 
@@ -76,12 +80,21 @@ Users.prototype.addUser = function (req, res) {
     var pass =  req.body.password;
     var username = req.body.username;
 
-    this.model.addUser( username, pass, ( function( result ) {
+    this.model.addUser( username, pass, ( function( err, result ) {
+        if ( err ) throw err;
 
-        result.message  =  result.success ? this.userAddedMessage :
-            this.userAlreadyExistsMessage;
+        var response  =  {};
+        if ( result.duplicate ) {
+             response.message = this.userAlreadyExistsMessage;
+        }
+        else {
+            response.success = true;
+            response.user = result[0];
+            response.message = this.userAddedMessage + ' ' + response.user.username;
+            req.session.authenticated  =  result[0]._id;
+        }
 
-        return res.send( result );
+        return res.send( response );
     }).bind( this ) );
 };
 
