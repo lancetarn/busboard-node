@@ -3,8 +3,8 @@
 /* Services */
 
 angular.module('myApp.services', [])
-  .factory('userService', ['$http', function($http) {
-    var storagePrefix = 'hotstop_';
+  .factory('userService', ['$rootScope', '$http', function( $rootScope, $http) {
+    var storageKey = 'hotstop_';
     return {
         login : function( username, password ) {
             var config = {
@@ -12,25 +12,33 @@ angular.module('myApp.services', [])
                 url : 'api/login',
                 data : {"username" : username, "password" : password}
             };
-            return $http(config).then( function( rsp ) {
-                return rsp.data;
-            } );
-        },
-
-        logout : function( ) {
-            var config = {
-                method : 'DELETE',
-                url : '/api/logout',
-            };
-
             return $http( config );
-        },
+				},
+
+		logout : function( ) {
+			var config = {
+				method : 'DELETE',
+				url : '/api/logout',
+			};
+
+			return $http( config );
+		},
+
+		getSessionUser : function( ) {
+			var config = {
+				method : 'GET',
+				url : '/api/user',
+			};
+			return $http( config ).then( function( rsp ) {
+				return  rsp.data.user;
+			});
+		},
 
         addUser : function( username, password ) {
             return $http({
-                method : 'POST',
-                url : '/api/user',
-                data : {"username" : username, "password" : password}
+                method  :  'POST',
+                url     :  '/api/user',
+                data    :  {"username" : username, "password" : password}
                 } )
             .success(function(data, status, headers, config) {
                 return data.message;
@@ -42,10 +50,11 @@ angular.module('myApp.services', [])
         saveHotStop : function( HotStop ) {
 
             if ( localStorage ) {
-                var stops = localStorage.getItem( storagePrefix );
+				var stopJSON  =  localStorage.getItem( storageKey );
+                var stops = JSON.parse( stopJSON );
                 stops = stops || [];
                 stops.push( HotStop );
-                localStorage.setItem( storagePrefix, JSON.stringify( stops ) );
+                localStorage.setItem( storageKey, JSON.stringify( stops ) );
             }
 
             var config = {
@@ -58,7 +67,7 @@ angular.module('myApp.services', [])
 
         getLocalStops : function( ) {
             if ( localStorage ) {
-                return JSON.pars( localStorage.getItem( storagePrefix ) );
+                return JSON.pars( localStorage.getItem( storageKey ) );
             }
             return false;
                         },
@@ -73,7 +82,7 @@ angular.module('myApp.services', [])
             .then( function( rsp ) {
 
                 if ( rsp.data.HotStops && localStorage ) {
-                    localStorage.setItem( storagePrefix, JSON.stringify( rsp.data.HotStops ) );
+                    localStorage.setItem( storageKey, JSON.stringify( rsp.data.HotStops ) );
                 }
 
                 return rsp.data.HotStops;
@@ -91,8 +100,8 @@ angular.module('myApp.services', [])
             });
         },
 
-        getStoragePrefix : function( ) {
-            return storagePrefix;
+        getStorageKey : function( ) {
+            return storageKey;
         }
     };
 }])
@@ -136,4 +145,3 @@ angular.module('myApp.services', [])
             }
         };
     }]);
-            

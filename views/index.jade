@@ -5,8 +5,8 @@ block body
     h2 BusBoard
     ul.menu
       li(ng-controller="LoginCtrl")
-        a(href='login', ng-hide="authenticated") Login
-        a(href='logout', ng-show="authenticated", ng-click='logout()' ) Logout
+        a(href='login', ng-hide="user") Login
+        a(href='logout', ng-show="user", ng-click='logout()' ) Logout
       li
         a(href='register') Register
 

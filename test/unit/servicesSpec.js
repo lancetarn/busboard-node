@@ -10,7 +10,7 @@ describe('service', function() {
       // Set up mock backend
       beforeEach( inject( function( userService, _$httpBackend_ ) {
          service = userService;
-        $httpBackend = _$httpBackend_; 
+        $httpBackend = _$httpBackend_;
         $httpBackend.when( 'POST', 'api/stops' ).respond( {"data":mockStop} );
         $httpBackend.when( 'DELETE', '/api/logout' ).respond( {"data" : {"message" : "logged out", "success" : true}} );
       }));
@@ -23,9 +23,12 @@ describe('service', function() {
               "direction" : "NORTHBOUND",
               "stop" : "TEST STOP"
           };
-          spyOn(localStorage, 'getItem').andCallFake(function (key) {
-            return store[key];
-          });
+			spyOn(localStorage, 'getItem').andCallFake(function (key) {
+				if ( store[key] ) {
+					return store[key];
+				}
+				return null;
+			});
           spyOn(localStorage, 'setItem').andCallFake(function (key, value) {
             return store[key] = value + '';
           });
@@ -38,19 +41,27 @@ describe('service', function() {
           $httpBackend.flush( );
       });
 
-        it('should call $http with proper config', function( ) {
-            $httpBackend.expectPOST( 'api/stops', mockStop );
-            service.saveHotStop( mockStop );
-        });
-        
+
+		it('should request stops with proper config', function( ) {
+			$httpBackend.expectPOST( 'api/stops', mockStop );
+			service.saveHotStop( mockStop );
+		});
+
         it('should try to store the stop locally', function( ) {
             service.saveHotStop( mockStop );
-            expect( localStorage.setItem ).toHaveBeenCalledWith( service.getStoragePrefix( ) + mockStop.route.Route, mockStop );
+            expect( localStorage.setItem ).toHaveBeenCalledWith( service.getStorageKey( ), JSON.stringify( [mockStop] ) );
         });
 
         it( 'should log the user out', function( ) {
             $httpBackend.expect( 'DELETE', '/api/logout' );
             service.logout( );
         });
+
+		it( 'should try to get the current user' , function( ) {
+			$httpBackend.expect( 'GET', '/api/user' ).respond( {"data": {"user" : "foo"} } );
+			service.getSessionUser( );
+		});
+
+		
     });
 });
