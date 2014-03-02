@@ -7,7 +7,8 @@ var express = require('express'),
   routes = require('./routes'),
   api = require('./routes/api'),
   http = require('http'),
-  path = require('path');
+  path = require('path'),
+  config = require( './settings' ),
   mongoStore = require('connect-mongo')(express);
 
 var app = module.exports = express();
@@ -19,7 +20,10 @@ app.set('view engine', 'jade');
 app.use(express.cookieParser());
 app.use(express.session({
     secret: 'tFmhaEYSAYzAkT6FERyJ9wXeAIkiPRW2',
-    store: new mongoStore({ db: 'busboard'})
+    store: new mongoStore({
+        db: config.db_config.name,
+        host: config.db_config.host
+    }),
 }));
 app.use(express.logger('dev'));
 app.use(express.bodyParser());

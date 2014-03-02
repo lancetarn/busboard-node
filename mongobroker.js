@@ -1,11 +1,12 @@
+var config = require( './settings' );
 var mongo = require('mongodb');
 var q = require('q');
 var mongoClient = mongo.MongoClient;
 var broker;
 
-mongoClient.connect('mongodb://localhost/busboard?w=1&auto_reconnect=true', function(err, db) {
+mongoClient.connect('mongodb://' + config.db_config.host + '/' + config.db_config.name + '?w=1&auto_reconnect=true', function(err, db) {
     if (err) {
-        console.log("Failed connecting to 'busboard' db");
+        console.log("Failed connecting to " + config.db_config.name + " db");
     }
     else {
         broker = db;
