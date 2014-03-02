@@ -14,6 +14,10 @@ UserModel.prototype.getCredsFromReq = function( req ) {
     };
 };
 
+UserModel.prototype.get = function( id, callback ) {
+    broker.find( collection, {"_id" : broker.makeId( id )}, {}, callback);
+};
+
 UserModel.prototype.getByName = function( username, callback ) {
     broker.find( collection, {"username" : username}, {}, callback );
 };
