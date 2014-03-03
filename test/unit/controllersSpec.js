@@ -16,6 +16,7 @@ describe('controllers', function(){
 		direction : { Text : "mockDirection" },
 		stop : { Text : "mockStop" }
 	};
+	var mockDeparture = { Actual : true, DepartureText : "99 min" };
 
 
 
@@ -76,7 +77,9 @@ describe('controllers', function(){
 		beforeEach( inject( function( $rootScope, $controller, userService, nexTripService, flash, $q ) {
 			$scope  =  $rootScope.$new( );
 			
-			spyOn( userService, 'getHotStops' ).andReturn( mockStop );
+			var deferred = $q.defer( );
+			deferred.resolve( [mockStop] );
+			spyOn( userService, 'getHotStops' ).andReturn( deferred.promise );
 
 			ctrl  =  $controller( 'hotStopCtrl', {
 				$scope          :  $scope,
@@ -95,14 +98,21 @@ describe('controllers', function(){
 
 		it( 'should try to get stops on load', function ( ) {
 			expect( uService.getHotStops ).toHaveBeenCalled( );
-			expect( $scope.HotStops ).toEqual( mockStop );
+			$scope.$apply( );
+			expect( $scope.HotStops ).toEqual( [mockStop] );
 		});
 
-		it( 'should get departures for a stop', function ( ) {
-			spyOn( nTService, 'getDepartures' ).andReturn( [ 5, 6, 7, 8] );
-			$scope.getDepartures( mockStop );
-			expect( nTService.getDepartures ).toHaveBeenCalledWith( mockStop );
-			expect( $scope.departures ).toEqual( [ 5, 6, 7, 8] );
+		it( 'should get departures for a HotStop at a given index', function ( ) {
+			$scope.$apply( );
+			
+			var def  =  q.defer( );
+			def.resolve( [mockDeparture] );
+			spyOn( nTService, 'getDepartures' ).andReturn( def.promise );
+
+			$scope.showDepartures( 0, mockStop );
+			$scope.$apply( );
+
+			expect( $scope.HotStops[0].departures ).toEqual( [mockDeparture] );
 		});
 
 	});
