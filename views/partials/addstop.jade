@@ -1,19 +1,21 @@
 button(ng-click="getRoutes()", ng-hide="routes") Add Stop
 
 select.route(ng-model="selectedRoute", ng-show="routes", ng-change="getDirections()", ng-options="r.Description for r in routes")
-        option(value="") Select route...
+		option(value="") Select route...
 
 select.direction(ng-model="selectedDirection", ng-show="directions", ng-change="getStops()", ng-options="d.Text for d in directions")
-    option(value="") Select direction...
+	option(value="") Select direction...
 
 select.stop(ng-model="selectedStop", ng-show="stops", ng-options="s.Text for s in stops", ng-change="setHotStop()")
-    option(value="") Select stop...
+	option(value="") Select stop...
 
 div(ng-show="selectedRoute && selectedDirection && selectedStop")
-    button(ng-click="saveHotStop()") Save Stop
-    button(ng-click="getDepartures()") View Departures
+	button(ng-click="saveHotStop()") Save Stop
 
 div(class="stoplist", ng-show="HotStops", ng-controller="hotStopCtrl")
-    ul.HotStops
-        li(ng-repeat="s in HotStops") {{s.route.Description }} | {{s.direction.Text}} | {{s.stop.Text}}
-            button(class="delete", ng-click="removeHotStop(s)") [x]
+	ul.HotStops
+		li(ng-repeat="s in HotStops")
+			span( class="hs_row", ng-click="showDepartures( $index, s )" ) {{s.route.Description }} | {{s.direction.Text}} | {{s.stop.Text}}
+			button(class="delete", ng-click="removeHotStop( $index, s )") [x]
+			ol( ng-show="s.departures", ng-hide="s.collapse", class="dep_list", ng-click="toggleDepartures( $index )")
+				li( ng-repeat="d in s.departures", ng-class="{actual : d.Actual}" ) {{d.DepartureText}}

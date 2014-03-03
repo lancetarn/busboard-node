@@ -7,6 +7,7 @@ var broker;
 mongoClient.connect('mongodb://' + config.db_config.host + '/' + config.db_config.name + '?w=1&auto_reconnect=true', function(err, db) {
     if (err) {
         console.log("Failed connecting to " + config.db_config.name + " db");
+		throw err;
     }
     else {
         broker = db;
@@ -40,9 +41,7 @@ module.exports = {
    },
 
    find : function( collName, query, fields, callback ) {
-        console.log( collName );
      var collection = broker.collection(collName);
-     console.log( collection );
      collection.find(query, fields).toArray( function(err, result) {
         if (err) return callback(err);
         

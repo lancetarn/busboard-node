@@ -4,19 +4,48 @@
 
 angular.module('myApp.controllers', [])
 
-	.controller('hotStopCtrl', ['$rootScope', '$scope', 'userService', 'flash', function( $rootScope, $scope, userService, flash ) {
+	.controller('hotStopCtrl', ['$rootScope', '$scope', 'userService', 'nexTripService', 'flash', function( $rootScope, $scope, userService, nexTripService, flash ) {
+		
+		var refreshInterval = 120000; // Two minutes
 
+		// Initially get all stops
 		userService.getHotStops( )
-		.then( function( HotStops ) {
-			$scope.HotStops = HotStops;
+		.then( function ( HotStops ) {
+			$scope.HotStops  =  HotStops;
 		});
 
-		$scope.removeHotStop = function( HotStop ) {
+		// Get and display departures for the set HotStop from nexTrip.
+		$scope.showDepartures = function( index, HotStop ) {
+
+			// If we already have them, just toggle
+			if ( HotStop.departures && HotStop.updatedAt > ( Date.now( ) - refreshInterval ) ) {
+				$scope.toggleDepartures( index );
+				return;
+			}
+
+			// Set the new departures on the hotstop
+			getDepartures( HotStop ).then(
+				function( departures ) {
+					$scope.HotStops[index].departures  =  departures;
+					$scope.HotStops[index].updatedAt = Date.now( );
+					console.log( departures );
+				},
+				function( error ) {
+					flash( "Sorry, there was an error getting departures." );
+				}
+			);
+		};
+
+		$scope.toggleDepartures = function( index ) {
+			$scope.HotStops[index].collapse  =  ! $scope.HotStops[index].collapse;
+		};
+
+		$scope.removeHotStop = function( index, HotStop ) {
 			userService.removeHotStop( HotStop )
 			.then(
 				// Success
 				function( ) {
-					$scope.HotStops.splice( $scope.HotStops.indexOf( HotStop ), 1 );
+					$scope.HotStops.splice( index, 1 );
 					flash( "Stop removed." );
 			},
 				// Error
@@ -26,10 +55,14 @@ angular.module('myApp.controllers', [])
 		};
 
 		$rootScope.$on( 'saveHotStop', function( e, HotStop ) {
-				$scope.HotStops = $scope.HotStops || [];
-				$scope.HotStops.push( HotStop );
+			$scope.HotStops = $scope.HotStops || [];
+			$scope.HotStops.push( HotStop );
 
 		});
+
+		function getDepartures( HotStop ) {
+			return nexTripService.getDepartures( HotStop );
+		}
 	}])
 
 	.controller('RouteCtrl', [ '$scope', 'userService', 'nexTripService', 'flash', function( $scope, userService, nexTripService, flash ) {
@@ -72,14 +105,6 @@ angular.module('myApp.controllers', [])
 			}
 		};
 
-		// Get departures for the set HotStop from nexTrip.
-		$scope.getDepartures = function( HotStop ) {
-			nexTripService.getDepartures( HotStop )
-			.then( function( departures ) {
-				console.log( departures );
-				$scope.departures = departures;
-			});
-		};
 
 		// Save the set HotStop to the user.
 		$scope.saveHotStop = function( ) {

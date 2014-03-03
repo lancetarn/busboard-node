@@ -33,7 +33,6 @@ UserModel.prototype.getStops = function( userId, callback ) {
 };
 
 UserModel.prototype.removeHotStop = function( userId, stop, callback ) {
-    console.log( 'Removing stop: ' + stop + ' from user: ' + userId );
     var Id = broker.makeId( userId );
     broker.update( collection, {"_id" : Id}, {$pull: {"HotStops" : stop}}, callback );
 };

@@ -3,13 +3,13 @@
  * Module dependencies
  */
 
-var express = require('express'),
-  routes = require('./routes'),
-  api = require('./routes/api'),
-  http = require('http'),
-  path = require('path'),
-  config = require( './settings' ),
-  mongoStore = require('connect-mongo')(express);
+var express   =  require('express'),
+  routes      =  require('./routes'),
+  api         =  require('./routes/api'),
+  http        =  require('http'),
+  path        =  require('path'),
+  config      =  require( './settings' ),
+  mongoStore  =  require('connect-mongo')(express);
 
 var app = module.exports = express();
 
@@ -19,7 +19,7 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.use(express.cookieParser());
 app.use(express.session({
-    secret: 'tFmhaEYSAYzAkT6FERyJ9wXeAIkiPRW2',
+    secret: config.session.secret,
     store: new mongoStore({
         db: config.db_config.name,
         host: config.db_config.host
@@ -57,7 +57,7 @@ app.post('/api/login', api.users.login.bind(api.users));
 app.delete('/api/logout', api.users.logout.bind(api.users));
 app.post('/api/stops', api.users.addStop.bind(api.users));
 app.get('/api/stops', api.users.getHotStops.bind(api.users));
-app.delete('/api/stops/delete', api.users.removeHotStop.bind(api.users));
+app.post('/api/stops/delete', api.users.removeHotStop.bind(api.users));
 
 // redirect all others to the index (HTML5 history)
 app.get('*', routes.index);

@@ -32,7 +32,6 @@ Users.prototype.addStop = function (req, res) {
 
 // Verify credentials, set session user to user._id
 Users.prototype.login = function (req, res) {
-	console.log( req.session.authenticated );
 	if ( req.session.authenticated ) res.send({"message" : "Already logged in.", "success" : true});
 
 	var creds = this.model.getCredsFromReq(req);
@@ -99,12 +98,13 @@ Users.prototype.addUser = function (req, res) {
 
 		var response  =  {};
 		if ( result.duplicate ) {
-			 response.message = this.userAlreadyExistsMessage;
+			response.message = this.userAlreadyExistsMessage;
 		}
 		else {
-			response.success = true;
-			response.user = result[0];
-			response.message = this.userAddedMessage + ' ' + response.user.username;
+			response.success  =  true;
+			response.user     =  result[0];
+			response.message  =  this.userAddedMessage + ' ' + response.user.username;
+
 			req.session.authenticated  =  result[0]._id;
 		}
 
@@ -130,11 +130,11 @@ Users.prototype.getHotStops = function( req, res ) {
 Users.prototype.removeHotStop = function ( req, res ) {
 	var userId = req.session.authenticated;
 	this.model.removeHotStop( userId, req.body, function( err, result ) {
-		console.log(result);
 		if ( err ) return res.send({"error" : err});
 
 		if ( result.length < 1 ) return res.send({"message" : "Update failed"});
 
+		console.log( 'Removing stop: ' + JSON.stringify( req.body ) + ' from user: ' + userId );
 		return res.send({"message" : "Stop removed."});
 	});
 };
