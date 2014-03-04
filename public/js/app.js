@@ -6,6 +6,7 @@ angular.module('myApp', [
   'myApp.filters',
   'myApp.services',
   'myApp.directives',
+  'ngRoute',
   'flash'
 ]).
 config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
