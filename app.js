@@ -11,8 +11,8 @@ var express   =  require('express'),
   config      =  require( './settings' ),
   mongoStore  =  require('connect-mongo')(express);
 
-var app = module.exports = express();
 
+var app = module.exports = express();
 // all environments
 app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
@@ -30,6 +30,20 @@ app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(app.router);
+
+// Custom CSRF location from Angular
+var csrfValue = function(req) {
+  var token = (req.body && req.body._csrf)
+    || (req.query && req.query._csrf)
+    || (req.headers['x-csrf-token'])
+    || (req.headers['x-xsrf-token']);
+  return token;
+};
+app.use(express.csrf({value: csrfValue}));
+app.use(function(req, res, next) {
+  res.cookie('XSRF-TOKEN', req.session._csrf);
+  next();
+});
 
 // development only
 if (app.get('env') === 'development') {
