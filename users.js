@@ -35,6 +35,9 @@ Users.prototype.login = function (req, res) {
 	if ( req.session.authenticated ) res.send({"message" : "Already logged in.", "success" : true});
 
 	var creds = this.model.getCredsFromReq(req);
+	console.log( creds );
+
+	if ( ! creds ) res.send({"message" : "Login failed.", "success" : false});
 	
 	// Try to find the user.
 	this.model.getByName( creds.user, function(err, result) {
@@ -50,7 +53,7 @@ Users.prototype.login = function (req, res) {
 
 		// Found one and only one user. Check pass with bcrypt, send result.
 		bcrypt.compare( creds.pass, user.password, function( err, match ) {
-			if (err) throw err;
+			if (err) res.send({"success" : false, "message" : "Login failed."});
 
 			req.session.authenticated = user._id;
 

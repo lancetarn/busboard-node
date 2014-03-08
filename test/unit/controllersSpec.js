@@ -116,5 +116,6 @@ describe('controllers', function(){
 		});
 
 	});
+
 });
 

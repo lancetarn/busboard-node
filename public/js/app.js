@@ -8,6 +8,7 @@ angular.module('myApp', [
   'myApp.directives',
   'ngRoute',
   'ngCookies',
+  'ui.bootstrap',
   'flash'
 ]).
 config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {

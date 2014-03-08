@@ -4,7 +4,7 @@
 
 angular.module('myApp.controllers', [])
 
-	.controller('hotStopCtrl', ['$rootScope', '$scope', 'userService', 'nexTripService', 'flash', function( $rootScope, $scope, userService, nexTripService, flash ) {
+	.controller('HotStopCtrl', ['$rootScope', '$scope', 'userService', 'nexTripService', 'flash', function( $rootScope, $scope, userService, nexTripService, flash ) {
 		
 		var refreshInterval = 120000; // Two minutes
 
@@ -124,59 +124,123 @@ angular.module('myApp.controllers', [])
 
 	}])
 
-	.controller('LoginCtrl', [ '$rootScope', '$scope', '$location', 'userService', 'flash', function( $rootScope, $scope, $location, userService, flash ) {
 
-	// Check for session on initial pageload.
-	userService.getSessionUser( )
-	.then( function ( user ) {
-		console.log( user );
-		$rootScope.user  =  user;
-	});
+	.controller( 'NavCtrl', [
+			'$rootScope',
+			'$scope',
+			'$log',
+			'$modal',
+			'userService',
+			'flash',
+			function( $rootScope, $scope, $log, $modal, userService, flash ) {
 
-	
-	$scope.authenticate = function( ) {
-		userService.login( $scope.username, $scope.password )
-		.then( function( rsp ) {
-			var path;
-			if ( rsp.data.success ) {
-				path = '/';
-				$rootScope.user  =  rsp.data.user;
+		// Check for session on initial pageload.
+		userService.getSessionUser( )
+		.then(
+			function ( user ) {
+				$rootScope.user  =  user;
+				$scope.actions   =  {
+					Login     :  !user,
+					Logout    :  !!user,
+					Register  :  !user
+				}
+			},
+			function ( e ) {
+				$log( e );
+			}
+		);
+
+		$scope.open  =  function( action ) {
+
+			if ( action === 'Logout' ) return logout( );
+
+			var modalInstance  =  $modal.open({
+				templateUrl : '/partials/' + action.toLowerCase( ),
+				controller  : action + 'Ctrl'
+			});
+			modalInstance.result.then( function( user ) {
+				console.log( user );
+				$log.info( user );
+				$scope.refreshActions( user );
+				$log.info( $scope.actions );
+			});
+		};
+
+		function logout( ) {
+			userService.logout( )
+			.then( function( resp ) {
+				$rootScope.user  =  false;
+				$scope.refreshActions( false );
+				console.log( $scope.actions );
+				flash( resp.data.message );
+			});
+		}
+
+		$scope.refreshActions  =  function( user ) {
+			console.log( user );
+			var actions  =  { };
+
+			if ( ! user ) {
+				actions.Login     =  true;
+				actions.Register  =  true;
 			}
 			else {
-				path = '/login';
+				actions.Logout  =  true;
 			}
-			flash( rsp.data.message );
-			$location.path( path );
-		});
-	};
 
-	$scope.logout = function( ) {
-		userService.logout( )
-		.then( function( resp ) {
-			$rootScope.user  =  false;
-			flash( resp.data.message );
-		});
-	};
+			$scope.actions  =  actions;
+		};
 
 	}])
 
 
-  .controller('RegisterCtrl', ['$rootScope', '$scope', '$location', 'userService', 'flash', function( $rootScope, $scope, $location, userService, flash ) {
-	$scope.addUser = function( ) {
-		var result = userService.addUser( $scope.newuser, $scope.newpass );
-		result.then( function( resp ) {
-			console.log( resp );
-			if ( resp.data.success ) {
-				flash( resp.data.message );
-				$rootScope.authenticated = resp.data.success;
-				$location.path("/");
-			}
-			else {
-				flash(resp.data.message);
-			}
-		});
-	};
-  }])
+	.controller('LoginCtrl', [
+			'$rootScope',
+			'$scope',
+			'$modalInstance',
+			'userService',
+			function( $rootScope, $scope, $modalInstance, userService ) {
+
+
+		$scope.authenticate = function( ) {
+			userService.login( $scope.username, $scope.password )
+			.then(
+				function( rsp ) {
+					var path;
+					if ( rsp.data.success ) {
+						$rootScope.user  =  rsp.data.user;
+						$modalInstance.close( rsp.data.user );
+					}
+					else {
+						$scope.notice  =  rsp.data.message;
+					}
+				},
+				function( e ) {
+					console.log( e );
+				}
+			);
+		};
+
+
+		}])
+
+
+	.controller('RegisterCtrl', ['$rootScope', '$scope', '$location', 'userService', 'flash', function( $rootScope, $scope, $location, userService, flash ) {
+		$scope.addUser = function( ) {
+			var result = userService.addUser( $scope.newuser, $scope.newpass );
+			result.then( function( resp ) {
+				console.log( resp );
+				if ( resp.data.success ) {
+					flash( resp.data.message );
+					$rootScope.authenticated = resp.data.success;
+					$location.path("/");
+				}
+				else {
+					flash(resp.data.message);
+				}
+			});
+		};
+	}])
   
   .controller('IndexCtrl', ['$rootScope', '$scope', 'flash', function( $rootScope, $scope, flash ) {
   }]);

@@ -12,10 +12,8 @@ select.stop(ng-model="selectedStop", ng-show="stops", ng-options="s.Text for s i
 div(ng-show="selectedRoute && selectedDirection && selectedStop")
 	button(ng-click="saveHotStop()") Save Stop
 
-div(class="stoplist", ng-show="HotStops", ng-controller="hotStopCtrl")
-	ul.HotStops
-		li(ng-repeat="s in HotStops")
-			span( class="hs_row", ng-click="showDepartures( $index, s )" ) {{s.route.Description }} | {{s.direction.Text}} | {{s.stop.Text}}
-			button(class="delete", ng-click="removeHotStop( $index, s )") [x]
+div(class="stoplist", ng-show="HotStops", ng-controller="HotStopCtrl")
+	accordion(class="HotStops", close-others=true)
+		accordion-group(ng-repeat="s in HotStops", heading="{{s.route.Description }} | {{s.direction.Text}} | {{s.stop.Text}}", ng-click="showDepartures( $index, s )")
 			ol( ng-show="s.departures", ng-hide="s.collapse", class="dep_list", ng-click="toggleDepartures( $index )")
 				li( ng-repeat="d in s.departures", ng-class="{actual : d.Actual}" ) {{d.DepartureText}}
