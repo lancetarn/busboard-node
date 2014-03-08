@@ -4,8 +4,8 @@ div.container
 	div.modal_body
 		form(name="register")
 			label(for="newuser") New Username
-			input(type="text", ng-model="newuser", name="newuser")
+			input(type="text", ng-model="$parent.newuser", name="newuser")
 			label(for="newpass") New Password
-			input(type="password", ng-model="newpass", name="newpass")
+			input(type="password", ng-model="$parent.newpass", name="newpass")
 	div.modal_footer
 			button(ng-click="addUser()") Register

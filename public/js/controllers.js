@@ -6,38 +6,34 @@ angular.module('myApp.controllers', [])
 
 	.controller('HotStopCtrl', ['$rootScope', '$scope', 'userService', 'nexTripService', 'flash', function( $rootScope, $scope, userService, nexTripService, flash ) {
 		
+		function refreshHotStops( ) {
+			userService.getHotStops( )
+			.then( function ( HotStops ) {
+				$scope.HotStops  =  HotStops;
+			});
+		}
+
 		var refreshInterval = 120000; // Two minutes
 
-		// Initially get all stops
-		userService.getHotStops( )
-		.then( function ( HotStops ) {
-			$scope.HotStops  =  HotStops;
-		});
+		// Changes to the logged-in user refresh stops
+		$scope.$watch('user', refreshHotStops );
 
 		// Get and display departures for the set HotStop from nexTrip.
 		$scope.showDepartures = function( index, HotStop ) {
 
 			// If we already have them, just toggle
-			if ( HotStop.departures && HotStop.updatedAt > ( Date.now( ) - refreshInterval ) ) {
-				$scope.toggleDepartures( index );
-				return;
-			}
+			if ( HotStop.departures && HotStop.updatedAt > ( Date.now( ) - refreshInterval ) ) return;
 
 			// Set the new departures on the hotstop
 			getDepartures( HotStop ).then(
 				function( departures ) {
 					$scope.HotStops[index].departures  =  departures;
 					$scope.HotStops[index].updatedAt = Date.now( );
-					console.log( departures );
 				},
 				function( error ) {
 					flash( "Sorry, there was an error getting departures." );
 				}
 			);
-		};
-
-		$scope.toggleDepartures = function( index ) {
-			$scope.HotStops[index].collapse  =  ! $scope.HotStops[index].collapse;
 		};
 
 		$scope.removeHotStop = function( index, HotStop ) {
@@ -129,10 +125,11 @@ angular.module('myApp.controllers', [])
 			'$rootScope',
 			'$scope',
 			'$log',
+			'$location',
 			'$modal',
 			'userService',
 			'flash',
-			function( $rootScope, $scope, $log, $modal, userService, flash ) {
+			function( $rootScope, $scope, $log, $location, $modal, userService, flash ) {
 
 		// Check for session on initial pageload.
 		userService.getSessionUser( )
@@ -153,8 +150,9 @@ angular.module('myApp.controllers', [])
 				templateUrl : '/partials/' + action.toLowerCase( ),
 				controller  : action + 'Ctrl'
 			});
-			modalInstance.result.then( function( user ) {
-				flash( "Welcome back, " + user + "!" );
+			modalInstance.result.then( function( msg ) {
+				flash( 'alert alert-success', msg );
+				$location.path("/");
 			});
 		};
 
@@ -162,7 +160,8 @@ angular.module('myApp.controllers', [])
 			userService.logout( )
 			.then( function( resp ) {
 				$rootScope.user  =  false;
-				flash( resp.data.message );
+				flash( 'alert alert-success', resp.data.message );
+				$location.path("/");
 			});
 		};
 	}])
@@ -183,7 +182,7 @@ angular.module('myApp.controllers', [])
 					var path;
 					if ( rsp.data.success ) {
 						$rootScope.user  =  rsp.data.user;
-						$modalInstance.close( rsp.data.user );
+						$modalInstance.close( rsp.data.message );
 					}
 					else {
 						$scope.notice  =  rsp.data.message;
@@ -199,18 +198,22 @@ angular.module('myApp.controllers', [])
 		}])
 
 
-	.controller('RegisterCtrl', ['$rootScope', '$scope', '$location', 'userService', 'flash', function( $rootScope, $scope, $location, userService, flash ) {
+	.controller('RegisterCtrl', [
+			'$rootScope',
+			'$scope',
+			'$modalInstance',
+			'userService',
+			function( $rootScope, $scope, $modalInstance, userService, flash ) {
+
 		$scope.addUser = function( ) {
 			var result = userService.addUser( $scope.newuser, $scope.newpass );
-			result.then( function( resp ) {
-				console.log( resp );
-				if ( resp.data.success ) {
-					flash( resp.data.message );
-					$rootScope.authenticated = resp.data.success;
-					$location.path("/");
+			result.then( function( rsp ) {
+				if ( rsp.data.success ) {
+					$rootScope.user = rsp.data.success;
+					$modalInstance.close( rsp.data.message );
 				}
 				else {
-					flash(resp.data.message);
+					$scope.notice  =  rsp.data.message;
 				}
 			});
 		};
