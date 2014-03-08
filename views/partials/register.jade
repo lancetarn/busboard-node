@@ -1,8 +1,11 @@
-h2 Register
-    div.register
-        form(name="register")
-            label(for="newuser") New Username
-            input(type="text", ng-model="newuser", name="newuser")
-            label(for="newpass") New Password
-            input(type="password", ng-model="newpass", name="newpass")
-            button(ng-click="addUser()") Register
+div.container
+	div.modal_header
+		h2 Register
+	div.modal_body
+		form(name="register")
+			label(for="newuser") New Username
+			input(type="text", ng-model="newuser", name="newuser")
+			label(for="newpass") New Password
+			input(type="password", ng-model="newpass", name="newpass")
+	div.modal_footer
+			button(ng-click="addUser()") Register
