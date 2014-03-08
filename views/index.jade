@@ -7,8 +7,12 @@ block body
 				a(class="navbar-brand", href='/') BusBoard
 			div(class="navbar-collapse")
 				ul(class="nav navbar-nav", ng-controller="NavCtrl")
-					li(ng-repeat="(action, exists) in actions", ng-show="{{exists}}")
-						a(ng-click="open(action)", href="/{{action}}") {{action}} 
+					li(ng-hide="user")
+						a(ng-click="open('Login')") Login
+					li(ng-show="user")
+						a(ng-click="logout()") Logout
+					li(ng-hide="user")
+						a(ng-click="open('Register')") Register
 
 	flash:messages
 	div(class="page-header container", role="main", ng-view)

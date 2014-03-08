@@ -139,11 +139,6 @@ angular.module('myApp.controllers', [])
 		.then(
 			function ( user ) {
 				$rootScope.user  =  user;
-				$scope.actions   =  {
-					Login     :  !user,
-					Logout    :  !!user,
-					Register  :  !user
-				}
 			},
 			function ( e ) {
 				$log( e );
@@ -159,38 +154,17 @@ angular.module('myApp.controllers', [])
 				controller  : action + 'Ctrl'
 			});
 			modalInstance.result.then( function( user ) {
-				console.log( user );
-				$log.info( user );
-				$scope.refreshActions( user );
-				$log.info( $scope.actions );
+				flash( "Welcome back, " + user + "!" );
 			});
 		};
 
-		function logout( ) {
+		$scope.logout  =  function( ) {
 			userService.logout( )
 			.then( function( resp ) {
 				$rootScope.user  =  false;
-				$scope.refreshActions( false );
-				console.log( $scope.actions );
 				flash( resp.data.message );
 			});
-		}
-
-		$scope.refreshActions  =  function( user ) {
-			console.log( user );
-			var actions  =  { };
-
-			if ( ! user ) {
-				actions.Login     =  true;
-				actions.Register  =  true;
-			}
-			else {
-				actions.Logout  =  true;
-			}
-
-			$scope.actions  =  actions;
 		};
-
 	}])
 
 
